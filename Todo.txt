@@ -2,6 +2,8 @@ AlphaBeth todo
 --------------------
 
 - Level hergenereren na een fout? (optie)
+	* Add screenshake
+	
 - Fog of war (optie)
 
 - Character niet meer laten snappen, maar eerder lerpen (DOTween)
