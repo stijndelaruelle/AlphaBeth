@@ -1,7 +1,6 @@
 AlphaBeth todo
 --------------------
 
-- Character niet meer laten snappen, maar eerder lerpen (DOTween)
 - Enemies toeoegen (die al dan niet het grid volgen?)
 	* Bomen die langzaam dichterbij creepen
 
@@ -35,3 +34,4 @@ Done
 	* Add screenshake
 	
 - Fog of war (optie)
+- Character niet meer laten snappen, maar eerder lerpen (DOTween)

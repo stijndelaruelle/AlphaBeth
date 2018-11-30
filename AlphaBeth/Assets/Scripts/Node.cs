@@ -29,6 +29,7 @@ public class Node : MonoBehaviour
 
     //Only used for the fog of war
     private bool m_IsExplored = false;
+    private bool m_IsAccessible = true;
 
     private void Awake()
     {
@@ -51,13 +52,14 @@ public class Node : MonoBehaviour
         SaveGameManager.BoolVariableChangedEvent -= OnSaveGameBoolVariableChanged;
     }
 
+
     private void UpdateVisualText()
     {
         //Function that manages all the visual stuff, so we don't spread this all over the place
         if (m_Text == null)
             return;
 
-        m_Text.enabled = (m_Characters.Count == 0);
+        m_Text.enabled = (m_Characters.Count == 0) && m_IsAccessible;
 
         //Check if fog of war is enabled
         if (SaveGameManager.GetBool(SaveGameManager.SAVE_OPTION_FOGOFWAR, true))
@@ -135,6 +137,12 @@ public class Node : MonoBehaviour
                 neighbour.Explore();
         }
 
+        //Nodes dissapear mode
+        if (SaveGameManager.GetBool(SaveGameManager.SAVE_OPTION_NODESDISAPPEAR, false))
+        {
+            m_IsAccessible = false;
+        }
+
         UpdateVisualText();
     }
 
@@ -162,6 +170,8 @@ public class Node : MonoBehaviour
     {
         //Level reset, so let's hide ourself
         m_IsExplored = false;
+        m_IsAccessible = true;
+
         UpdateVisualText();
     }
 

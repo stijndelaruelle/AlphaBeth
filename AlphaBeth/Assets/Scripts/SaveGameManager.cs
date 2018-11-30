@@ -18,6 +18,7 @@ public static class SaveGameManager
     public static string SAVE_LEVEL_SEED = "SAVE_LEVEL_SEED";
     public static string SAVE_OPTION_NEWCHARSONMISTAKE = "SAVE_OPTION_NEWCHARSONMISTAKE";
     public static string SAVE_OPTION_FOGOFWAR = "SAVE_OPTION_FOGOFWAR";
+    public static string SAVE_OPTION_NODESDISAPPEAR = "SAVE_OPTION_NODESDISAPPEAR";
     public static string SAVE_OPTION_SCREENSHAKE = "SAVE_OPTION_SCREENSHAKE";
 
     public static event SaveGameDelegate VariableChangedEvent;
