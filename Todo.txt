@@ -1,0 +1,37 @@
+AlphaBeth todo
+--------------------
+
+- Begin/midden/eind aan breien
+	* Begin popup, start! (met uitleg)
+	* Eind popup, tijd + aantal fouten
+
+- Level hergenereren na een fout? (optie)
+- Fog of war (optie)
+
+- Plaats camera goed na level generation (generator geeft bounds terug?)
+	* EN/OF Laat camera met character meepannen (deadzone etc, cinemachine)
+
+- Character niet meer laten snappen, maar eerder lerpen (DOTween)
+- Enemies toeoegen (die al dan niet het grid volgen?)
+	* Bomen die langzaam dichterbij creepen
+
+- Simpele "echte" level generator
+	* Begin op een tile en laat hem lopen voor x keer (moet altijd in nieuwe richting)
+	* Op willekeurige plekken takken gaan toevoegen
+
+- Leveltje maken met preset woorden
+	* Geen woorden maar
+		- Dadels
+		- Zwanen
+		- Bananen
+	* Words can not describe
+		- This place
+		- How I feel
+		- ...
+
+Done
+--------------------
+
+- Level seed ook echt implementeren
+- Fix text generation, je mag wel 2 dezelfde letters naast elkaar hebben (als je op een E staat, kan er naast je een E zijn!)
+- Options in playerprefs stoppen?

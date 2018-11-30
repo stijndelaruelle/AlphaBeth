@@ -6,12 +6,14 @@ public class Player : MonoBehaviour
 {
     //Delegates
     public delegate void InputMistakeDelegate();
+    public delegate void ReachedExitDelegate();
 
     //Variable
     private Node m_CurrentNode;
 
     //Events
     public event InputMistakeDelegate InputMistakeEvent;
+    public event ReachedExitDelegate ReachedExitEvent;
 
     //Functions
     private void Update()
@@ -22,6 +24,12 @@ public class Player : MonoBehaviour
     private void HandleMovement()
     {
         if (m_CurrentNode == null)
+            return;
+
+        if (LevelDirector.Instance == null)
+            return;
+
+        if (LevelDirector.Instance.HasInputBlockers())
             return;
 
         //Check what key was pressed this frame, and if there is neighbour with that key.
@@ -60,7 +68,19 @@ public class Player : MonoBehaviour
 
     public void SetNode(Node node)
     {
+        if (m_CurrentNode != null)
+            m_CurrentNode.RemoveCharacter(this);
+
         m_CurrentNode = node;
         transform.position = m_CurrentNode.transform.position;
+
+        m_CurrentNode.AddCharacter(this);
+
+        //Temp, should become a separate exit tile (just like HackShield)
+        if (m_CurrentNode.IsExit)
+        {
+            if (ReachedExitEvent != null)
+                ReachedExitEvent();
+        }
     }
 }

@@ -27,11 +27,10 @@ public class LevelGenerator : MonoBehaviour
     }
 
     private Coroutine m_CurrentRoutine;
-
     public event LevelDelegate LevelGeneratedEvent;
     
 
-    public void GenerateGridLevel(int width, int height, string availableCharacters, int seed)
+    public void GenerateGridLevel()
     {
         if (m_NodePrefab == null)
         {
@@ -42,11 +41,17 @@ public class LevelGenerator : MonoBehaviour
         if (m_CurrentRoutine != null)
             StopCoroutine(m_CurrentRoutine);
 
-        m_CurrentRoutine = StartCoroutine(GenerateGridLevelRoutine(width, height, availableCharacters, seed));
+        m_CurrentRoutine = StartCoroutine(GenerateGridLevelRoutine());
     }
 
-    private IEnumerator GenerateGridLevelRoutine(int width, int height, string availableTextCharacters, int seed)
+    private IEnumerator GenerateGridLevelRoutine()
     {
+        //Temp, wait one frame so everyone has the time to do subscribe etc before a level actually get's generated
+        //yield return new WaitForEndOfFrame();
+
+        int width = SaveGameManager.GetInt(SaveGameManager.SAVE_LEVEL_WIDTH, 5);
+        int height = SaveGameManager.GetInt(SaveGameManager.SAVE_LEVEL_HEIGHT, 5);
+        
         if (m_Nodes == null) { m_Nodes = new List<Node>(); }
         else { ClearLevel(); }
 
@@ -91,11 +96,20 @@ public class LevelGenerator : MonoBehaviour
         }
 
         //Assign node characters
-        AssignNodeTextCharacters(availableTextCharacters, seed);
+        AssignNodeTextCharacters();
 
-        //Assign start & end nodes
-        m_StartNode = m_Nodes[0];
-        m_EndNode = m_Nodes[m_Nodes.Count - 1];
+        //Assign start node
+        List<int> quadrants = new List<int> { 0, 1, 2, 3 };
+
+        int randStartQuadrant = Random.Range(0, quadrants.Count);
+        m_StartNode = GetRandomNodeInQuadrant(width, height, quadrants[randStartQuadrant]);
+
+        //Assign end node
+        quadrants.Remove(randStartQuadrant); //Make sure the end quadrant is not the same as the start one
+
+        int randEndQuadrant = Random.Range(0, quadrants.Count);
+        m_EndNode = GetRandomNodeInQuadrant(width, height, quadrants[randEndQuadrant]);
+        m_EndNode.SetExit(true); //Visualize
 
         //Let the world know!
         if (LevelGeneratedEvent != null)
@@ -118,8 +132,11 @@ public class LevelGenerator : MonoBehaviour
     }
 
 
-    private void AssignNodeTextCharacters(string availableTextCharacters, int seed)
+    private void AssignNodeTextCharacters()
     {
+        string availableTextCharacters = SaveGameManager.GetString(SaveGameManager.SAVE_LEVEL_TEXTCHARACTERS, "sdfghjkl");
+        int seed = SaveGameManager.GetInt(SaveGameManager.SAVE_LEVEL_SEED, 42);
+
         ClearNodeTextCharacters();
 
         Random.InitState(seed);
@@ -132,16 +149,16 @@ public class LevelGenerator : MonoBehaviour
             //Create an array of all still available characters
             List<char> availableTextCharactersList = new List<char>(availableTextCharacters.ToCharArray());
 
-            //Remove characters that our neighbours (and our neighbours neighbours!) have claimed
+            //Remove characters that our neighbours neighbours have claimed
             for (int dir = 0; dir <= (int)Direction.West; ++dir)
             {
                 Node neighbour = currentNode.GetNeighbour((Direction)dir);
 
                 if (neighbour != null)
                 {
-                    //Character this neighbour has claimed
-                    char takenChar = neighbour.GetTextCharacter();
-                    if (takenChar != '\0') { availableTextCharactersList.Remove(takenChar); }
+                    //Character this neighbour has claimed (this is allowed, you can have an E next to a another E (the one you're standing on))
+                    //char takenChar = neighbour.GetTextCharacter();
+                    //if (takenChar != '\0') { availableTextCharactersList.Remove(takenChar); }
 
                     //Characters his neighbours have claimed
                     for (int dir2 = 0; dir2 <= (int)Direction.West; ++dir2)
@@ -150,7 +167,7 @@ public class LevelGenerator : MonoBehaviour
 
                         if (neighbour2 != null)
                         {
-                            takenChar = neighbour2.GetTextCharacter();
+                            char takenChar = neighbour2.GetTextCharacter();
                             if (takenChar != '\0') { availableTextCharactersList.Remove(takenChar); }
                         }
                     }
@@ -174,5 +191,47 @@ public class LevelGenerator : MonoBehaviour
         {
             m_Nodes[i].SetTextCharacter('\0');
         }
+    }
+
+    //Utility
+    private Node GetRandomNodeInQuadrant(int width, int height, int quadrant)
+    {
+        if (m_Nodes == null)
+            return null;
+
+        //X
+        bool isWidthOdd = ((width % 2) != 0);
+        bool isWidthQuadrantOdd = ((quadrant % 2) != 0);
+
+        int quadrandWidth = Mathf.FloorToInt(width * 0.5f);
+
+        int minStartX = (quadrant % 2) * quadrandWidth;
+        if (isWidthOdd && isWidthQuadrantOdd) { minStartX += 1; } //With odd sizes, the middle row is not used
+
+        int maxStartX = minStartX + quadrandWidth; //-1, but because Random.Range is exclusive, we don't bother
+
+        int randStartX = Random.Range(minStartX, maxStartX);
+
+        //Y
+        bool isHeightOdd = ((height % 2) != 0);
+        bool isHeightQuadrantOdd = (Mathf.FloorToInt(quadrant / 2) != 0);
+
+        int quadrantHeight = Mathf.FloorToInt(height * 0.5f);
+
+        int minStartY = (quadrant / 2) * quadrantHeight;
+        if (isHeightOdd && isHeightQuadrantOdd) { minStartY += 1; }
+
+        int maxStartY = minStartY + quadrantHeight; //-1, but because Random.Range is exclusive, we don't bother
+
+        int randStartY = Random.Range(minStartY, maxStartY);
+
+        //Combine into a node ID
+        int nodeID = randStartX + (randStartY * width);
+
+        //Fetch the node
+        if (nodeID < 0 || nodeID >= m_Nodes.Count)
+            return null;
+
+        return m_Nodes[nodeID];
     }
 }

@@ -1,13 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class LevelSettingsPanelUI : MonoBehaviour
 {
-    [SerializeField]
-    private LevelGenerator m_LevelGenerator;
-
+    [Header("Input Fields")]
     [SerializeField]
     private InputField m_WidthInputField;
 
@@ -15,15 +14,59 @@ public class LevelSettingsPanelUI : MonoBehaviour
     private InputField m_HeightInputField;
 
     [SerializeField]
-    private InputField m_AvailableCharactersInputField;
+    private InputField m_TextCharactersInputField;
 
     [SerializeField]
     private InputField m_SeedInputField;
 
+    [SerializeField]
+    private Button m_GenerateButton;
+
+    [Header("Other references")]
+    [SerializeField]
+    private LevelGenerator m_LevelGenerator;
+
+    [SerializeField]
+    private CanvasGroup m_CanvasGroup;
+
     private void Start()
     {
-        //Hide ourselves
-        Hide();
+        if (m_CanvasGroup != null)
+            m_CanvasGroup.Hide();
+    }
+
+
+    private void OnDestroy()
+    {
+        if (m_LevelGenerator != null)
+            m_LevelGenerator.LevelGeneratedEvent -= OnLevelGeneratedTroughUs;
+    }
+
+    public void Show()
+    {
+        if (m_CanvasGroup != null)
+            m_CanvasGroup.Show();
+
+        if (LevelDirector.Instance != null)
+            LevelDirector.Instance.AddInputBlocker();
+
+        if (m_GenerateButton != null)
+            StartCoroutine(SelectButtonRoutine());
+
+        //Load all the save game data
+        m_WidthInputField.text = SaveGameManager.GetInt(SaveGameManager.SAVE_LEVEL_WIDTH, 5).ToString();
+        m_HeightInputField.text = SaveGameManager.GetInt(SaveGameManager.SAVE_LEVEL_HEIGHT, 5).ToString();
+        m_TextCharactersInputField.text = SaveGameManager.GetString(SaveGameManager.SAVE_LEVEL_TEXTCHARACTERS, "sdfghjkl");
+        m_SeedInputField.text = SaveGameManager.GetInt(SaveGameManager.SAVE_LEVEL_SEED, 42).ToString();
+    }
+
+    public void Hide()
+    {
+        if (m_CanvasGroup != null)
+            m_CanvasGroup.Hide();
+
+        if (LevelDirector.Instance != null)
+            LevelDirector.Instance.RemoveInputBlocker();
     }
 
     public void GenerateLevel()
@@ -54,19 +97,32 @@ public class LevelSettingsPanelUI : MonoBehaviour
             return;
         }
 
-        m_LevelGenerator.GenerateGridLevel(width, height, m_AvailableCharactersInputField.text, seed);
+        //Save the settings
+        SaveGameManager.SetInt(SaveGameManager.SAVE_LEVEL_WIDTH, width);
+        SaveGameManager.SetInt(SaveGameManager.SAVE_LEVEL_HEIGHT, height);
+        SaveGameManager.SetString(SaveGameManager.SAVE_LEVEL_TEXTCHARACTERS, m_TextCharactersInputField.text);
+        SaveGameManager.SetInt(SaveGameManager.SAVE_LEVEL_SEED, seed);
+
+        m_LevelGenerator.LevelGeneratedEvent += OnLevelGeneratedTroughUs;
+        m_LevelGenerator.GenerateGridLevel();
+    }
+
+    private IEnumerator SelectButtonRoutine()
+    {
+        //Wtf event system?
+        EventSystem.current.SetSelectedGameObject(null);
+        yield return new WaitForEndOfFrame();
+        EventSystem.current.SetSelectedGameObject(m_GenerateButton.gameObject);
+    }
+
+    private void OnLevelGeneratedTroughUs()
+    {
+        m_LevelGenerator.LevelGeneratedEvent -= OnLevelGeneratedTroughUs;
 
         //We've one our job!
+        if (LevelDirector.Instance != null)
+            LevelDirector.Instance.StartLevel();
+
         Hide();
-    }
-
-    public void Show()
-    {
-        gameObject.SetActive(true);
-    }
-
-    public void Hide()
-    {
-        gameObject.SetActive(false);
     }
 }

@@ -18,12 +18,36 @@ public class Node : MonoBehaviour
 
     private char m_TextCharacter = '\0';
     private Node[] m_Neighbours = new Node[4]; //Currently 4, could become 8
+    private List<Player> m_Characters; //For now this is only the player, change to a more generic "character" once we start addng enemies
 
+    private bool m_IsExit = false;
+    public bool IsExit
+    {
+        get { return m_IsExit; }
+    }
+
+    private void Awake()
+    {
+        m_Characters = new List<Player>();
+    }
+
+
+    private void UpdateVisualText()
+    {
+        //Function that manages all the visual stuff, so we don't spread this all over the place
+        if (m_Text == null)
+            return;
+
+        m_Text.enabled = (m_Characters.Count == 0);
+        m_Text.text = m_TextCharacter.ToString();
+
+        if (m_IsExit) { m_Text.color = Color.yellow; }
+    }
 
     public void SetTextCharacter(char textChar)
     {
         m_TextCharacter = textChar;
-        m_Text.text = m_TextCharacter.ToString();
+        UpdateVisualText();
     }
 
     public char GetTextCharacter()
@@ -50,6 +74,27 @@ public class Node : MonoBehaviour
             return '\0';
 
         return neighbour.GetTextCharacter();
+    }
+
+
+    public void AddCharacter(Player player)
+    {
+        m_Characters.Add(player);
+        UpdateVisualText();
+    }
+
+    public void RemoveCharacter(Player player)
+    {
+        m_Characters.Remove(player);
+        UpdateVisualText();
+    }
+
+
+    //Temp, just to visualise where the exit is, this should become a level object at some point (just like HackShield)
+    public void SetExit(bool state)
+    {
+        m_IsExit = state;
+        UpdateVisualText();
     }
 
     private void OnDrawGizmos()

@@ -18,25 +18,40 @@ public class MistakeCounterUI : MonoBehaviour
         m_Text = GetComponent<Text>();
         UpdateText();
 
+        if (LevelDirector.Instance != null)
+            LevelDirector.Instance.LevelStartEvent += OnLevelStart;
+
         if (m_Player != null)
             m_Player.InputMistakeEvent += OnInputMistake;
     }
 
     private void OnDestroy()
     {
+        if (LevelDirector.Instance != null)
+            LevelDirector.Instance.LevelStartEvent -= OnLevelStart;
+
         if (m_Player != null)
             m_Player.InputMistakeEvent -= OnInputMistake;
     }
 
     private void UpdateText()
     {
-        string mistakeText = m_MistakeCount + " mistake";
+        string mistakeText = m_MistakeCount + " typo";
         if (m_MistakeCount != 1) { mistakeText += "s"; }
+
 
         m_Text.text = mistakeText;
     }
 
-    //Event callback
+    //Event callbacks
+    private void OnLevelStart()
+    {
+        //Reset conter
+        m_MistakeCount = 0;
+        UpdateText();
+    }
+
+
     private void OnInputMistake()
     {
         m_MistakeCount += 1;
