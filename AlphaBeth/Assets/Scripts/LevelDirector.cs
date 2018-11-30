@@ -60,11 +60,11 @@ public class LevelDirector : Singleton<LevelDirector>
         if (m_IsLevelReady == false)
             return;
 
-        //Reset player position
-        m_Player.SetNode(m_LevelGenerator.StartNode);
-
         if (LevelStartEvent != null)
             LevelStartEvent();
+
+        //Reset player position (after event because of fog of war sequencing). This may bite us later on
+        m_Player.SetNode(m_LevelGenerator.StartNode);
     }
 
     //Input Blocker
