@@ -33,14 +33,18 @@ public class LevelSettingsPanelUI : MonoBehaviour
     {
         if (m_CanvasGroup != null)
             m_CanvasGroup.Hide();
-    }
 
+        SaveGameManager.DeletedEvent += OnDeleteSaveGame;
+    }
 
     private void OnDestroy()
     {
         if (m_LevelGenerator != null)
             m_LevelGenerator.LevelGeneratedEvent -= OnLevelGeneratedTroughUs;
+
+        SaveGameManager.DeletedEvent -= OnDeleteSaveGame;
     }
+
 
     public void Show()
     {
@@ -57,7 +61,7 @@ public class LevelSettingsPanelUI : MonoBehaviour
         m_WidthInputField.text = SaveGameManager.GetInt(SaveGameManager.SAVE_LEVEL_WIDTH, 5).ToString();
         m_HeightInputField.text = SaveGameManager.GetInt(SaveGameManager.SAVE_LEVEL_HEIGHT, 5).ToString();
         m_TextCharactersInputField.text = SaveGameManager.GetString(SaveGameManager.SAVE_LEVEL_TEXTCHARACTERS, "sdfghjkl");
-        m_SeedInputField.text = SaveGameManager.GetInt(SaveGameManager.SAVE_LEVEL_SEED, 42).ToString();
+        m_SeedInputField.text = SaveGameManager.GetInt(SaveGameManager.SAVE_LEVEL_SEED, -1).ToString();
     }
 
     public void Hide()
@@ -68,6 +72,7 @@ public class LevelSettingsPanelUI : MonoBehaviour
         if (LevelDirector.Instance != null)
             LevelDirector.Instance.RemoveInputBlocker();
     }
+
 
     public void GenerateLevel()
     {
@@ -91,17 +96,20 @@ public class LevelSettingsPanelUI : MonoBehaviour
             return;
         }
 
+        bool seedSuccess = true;
         if (int.TryParse(m_SeedInputField.text, out seed) == false)
         {
-            Debug.Log("Seed did not contain a valid number!");
-            return;
+            Debug.Log("Seed did not contain a valid number, will be random!");
+            seedSuccess = false;
         }
 
         //Save the settings
         SaveGameManager.SetInt(SaveGameManager.SAVE_LEVEL_WIDTH, width);
         SaveGameManager.SetInt(SaveGameManager.SAVE_LEVEL_HEIGHT, height);
         SaveGameManager.SetString(SaveGameManager.SAVE_LEVEL_TEXTCHARACTERS, m_TextCharactersInputField.text);
-        SaveGameManager.SetInt(SaveGameManager.SAVE_LEVEL_SEED, seed);
+
+        if (seedSuccess)
+            SaveGameManager.SetInt(SaveGameManager.SAVE_LEVEL_SEED, seed);
 
         m_LevelGenerator.LevelGeneratedEvent += OnLevelGeneratedTroughUs;
         m_LevelGenerator.GenerateGridLevel();
@@ -124,5 +132,14 @@ public class LevelSettingsPanelUI : MonoBehaviour
             LevelDirector.Instance.StartLevel();
 
         Hide();
+    }
+
+    private void OnDeleteSaveGame()
+    {
+        //Reset data
+        m_WidthInputField.text = SaveGameManager.GetInt(SaveGameManager.SAVE_LEVEL_WIDTH, 5).ToString();
+        m_HeightInputField.text = SaveGameManager.GetInt(SaveGameManager.SAVE_LEVEL_HEIGHT, 5).ToString();
+        m_TextCharactersInputField.text = SaveGameManager.GetString(SaveGameManager.SAVE_LEVEL_TEXTCHARACTERS, "sdfghjkl");
+        m_SeedInputField.text = SaveGameManager.GetInt(SaveGameManager.SAVE_LEVEL_SEED, -1).ToString();
     }
 }

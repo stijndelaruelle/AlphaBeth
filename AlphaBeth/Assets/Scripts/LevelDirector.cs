@@ -37,6 +37,7 @@ public class LevelDirector : Singleton<LevelDirector>
         if (m_Player != null)
         {
             m_Player.ReachedExitEvent += OnPlayerReachedExit;
+            m_Player.InputMistakeEvent += OnPlayerInputMistake;
         }
     }
 
@@ -48,7 +49,10 @@ public class LevelDirector : Singleton<LevelDirector>
             m_LevelGenerator.LevelGeneratedEvent -= OnLevelGenerated;
 
         if (m_Player != null)
+        {
             m_Player.ReachedExitEvent -= OnPlayerReachedExit;
+            m_Player.InputMistakeEvent -= OnPlayerInputMistake;
+        }
     }
 
     public void StartLevel()
@@ -95,5 +99,14 @@ public class LevelDirector : Singleton<LevelDirector>
     {
         if (LevelEndEvent != null)
             LevelEndEvent();
+    }
+
+    private void OnPlayerInputMistake()
+    {
+        //Check if te option is enabled
+        if (SaveGameManager.GetBool(SaveGameManager.SAVE_OPTION_NEWCHARSONMISTAKE, true) == false)
+            return;
+
+        m_LevelGenerator.AssignNodeTextCharacters();
     }
 }

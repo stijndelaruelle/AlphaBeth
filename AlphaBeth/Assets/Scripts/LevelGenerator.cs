@@ -54,7 +54,13 @@ public class LevelGenerator : MonoBehaviour
 
         int width = SaveGameManager.GetInt(SaveGameManager.SAVE_LEVEL_WIDTH, 5);
         int height = SaveGameManager.GetInt(SaveGameManager.SAVE_LEVEL_HEIGHT, 5);
-        
+        int seed = SaveGameManager.GetInt(SaveGameManager.SAVE_LEVEL_SEED, -1);
+
+        if (seed == -1)
+            Random.InitState(System.Environment.TickCount); //Random enough?
+        else
+            Random.InitState(seed);
+
         if (m_Nodes == null) { m_Nodes = new List<Node>(); }
         else { ClearLevel(); }
 
@@ -99,7 +105,7 @@ public class LevelGenerator : MonoBehaviour
         }
 
         //Assign node characters
-        AssignNodeTextCharacters();
+        AssignNodeTextCharacters(seed);
 
         //Assign start node
         List<int> quadrants = new List<int> { 0, 1, 2, 3 };
@@ -156,14 +162,16 @@ public class LevelGenerator : MonoBehaviour
     }
 
 
-    private void AssignNodeTextCharacters()
+    public void AssignNodeTextCharacters(int seed = -1)
     {
         string availableTextCharacters = SaveGameManager.GetString(SaveGameManager.SAVE_LEVEL_TEXTCHARACTERS, "sdfghjkl");
-        int seed = SaveGameManager.GetInt(SaveGameManager.SAVE_LEVEL_SEED, 42);
 
         ClearNodeTextCharacters();
 
-        Random.InitState(seed);
+        if (seed == -1)
+            Random.InitState(System.Environment.TickCount); //Random enough?
+        else
+            Random.InitState(seed);
 
         //Give all the nodes a random character
         for (int i = 0; i < m_Nodes.Count; ++i)

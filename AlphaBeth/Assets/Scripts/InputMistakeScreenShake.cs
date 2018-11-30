@@ -67,6 +67,10 @@ public class InputMistakeScreenShake : MonoBehaviour
 
     private void OnInputMistake()
     {
+        //Check if te option is enabled
+        if (SaveGameManager.GetBool(SaveGameManager.SAVE_OPTION_SCREENSHAKE, true) == false)
+            return;
+
         if (m_ShakeRoutine != null)
             StopCoroutine(m_ShakeRoutine);
 

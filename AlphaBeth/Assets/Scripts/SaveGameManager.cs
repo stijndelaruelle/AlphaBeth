@@ -12,10 +12,13 @@ public static class SaveGameManager
     public delegate void SaveGameStringDelegate(string key, string value);
     public delegate void SaveGameDeletedDelegate();
 
-    public static string SAVE_LEVEL_WIDTH = "LevelWidth";
-    public static string SAVE_LEVEL_HEIGHT = "LevelHeight";
-    public static string SAVE_LEVEL_TEXTCHARACTERS = "LevelTextCharacters";
-    public static string SAVE_LEVEL_SEED = "LevelSeed";
+    public static string SAVE_LEVEL_WIDTH = "SAVE_LEVEL_WIDTH";
+    public static string SAVE_LEVEL_HEIGHT = "SAVE_LEVEL_HEIGHT";
+    public static string SAVE_LEVEL_TEXTCHARACTERS = "SAVE_LEVEL_TEXTCHARACTERS";
+    public static string SAVE_LEVEL_SEED = "SAVE_LEVEL_SEED";
+    public static string SAVE_OPTION_NEWCHARSONMISTAKE = "SAVE_OPTION_NEWCHARSONMISTAKE";
+    public static string SAVE_OPTION_FOGOFWAR = "SAVE_OPTION_FOGOFWAR";
+    public static string SAVE_OPTION_SCREENSHAKE = "SAVE_OPTION_SCREENSHAKE";
 
     public static event SaveGameDelegate VariableChangedEvent;
     public static event SaveGameIntDelegate IntVariableChangedEvent;
