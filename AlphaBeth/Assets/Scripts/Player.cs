@@ -7,6 +7,7 @@ public class Player : MonoBehaviour
     //Delegates
     public delegate void InputMistakeDelegate();
     public delegate void ReachedExitDelegate();
+    public delegate void MoveDelegate(Node newNode);
 
     //Variable
     private Node m_CurrentNode;
@@ -14,6 +15,7 @@ public class Player : MonoBehaviour
     //Events
     public event InputMistakeDelegate InputMistakeEvent;
     public event ReachedExitDelegate ReachedExitEvent;
+    public event MoveDelegate MoveEvent;
 
     //Functions
     private void Update()
@@ -72,9 +74,10 @@ public class Player : MonoBehaviour
             m_CurrentNode.RemoveCharacter(this);
 
         m_CurrentNode = node;
-        transform.position = m_CurrentNode.transform.position;
-
         m_CurrentNode.AddCharacter(this);
+
+        if (MoveEvent != null)
+            MoveEvent(m_CurrentNode);
 
         //Temp, should become a separate exit tile (just like HackShield)
         if (m_CurrentNode.IsExit)

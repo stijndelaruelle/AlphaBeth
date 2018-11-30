@@ -51,6 +51,9 @@ public class LevelEndPanelUI : MonoBehaviour
     {
         if (m_CanvasGroup != null)
             m_CanvasGroup.Hide();
+
+        if (LevelDirector.Instance != null)
+            LevelDirector.Instance.RemoveInputBlocker();
     }
 
     private void OnLevelEnd()
@@ -60,5 +63,8 @@ public class LevelEndPanelUI : MonoBehaviour
 
         if (m_ResetButton != null)
             StartCoroutine(SelectButtonRoutine());
+
+        if (LevelDirector.Instance != null)
+            LevelDirector.Instance.AddInputBlocker();
     }
 }

@@ -28,6 +28,9 @@ public class LevelStartPanelUI : MonoBehaviour
 
         if (m_CanvasGroup != null)
             m_CanvasGroup.Show();
+
+        if (LevelDirector.Instance != null)
+            LevelDirector.Instance.AddInputBlocker();
     }
 
     private void OnDestroy()
@@ -64,5 +67,8 @@ public class LevelStartPanelUI : MonoBehaviour
     {
         if (m_CanvasGroup != null)
             m_CanvasGroup.Hide();
+
+        if (LevelDirector.Instance != null)
+            LevelDirector.Instance.RemoveInputBlocker();
     }
 }
