@@ -97,7 +97,7 @@ public class Node : MonoBehaviour
         UpdateVisualText();
     }
 
-    private void OnDrawGizmos()
+    private void OnDrawGizmosSelected()
     {
         // Draw a yellow sphere at the transform's position
         Color[] colors = new Color[] { Color.green, Color.red, Color.blue, Color.yellow };

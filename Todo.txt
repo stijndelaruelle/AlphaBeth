@@ -1,15 +1,8 @@
 AlphaBeth todo
 --------------------
 
-- Begin/midden/eind aan breien
-	* Begin popup, start! (met uitleg)
-	* Eind popup, tijd + aantal fouten
-
 - Level hergenereren na een fout? (optie)
 - Fog of war (optie)
-
-- Plaats camera goed na level generation (generator geeft bounds terug?)
-	* EN/OF Laat camera met character meepannen (deadzone etc, cinemachine)
 
 - Character niet meer laten snappen, maar eerder lerpen (DOTween)
 - Enemies toeoegen (die al dan niet het grid volgen?)
@@ -35,3 +28,8 @@ Done
 - Level seed ook echt implementeren
 - Fix text generation, je mag wel 2 dezelfde letters naast elkaar hebben (als je op een E staat, kan er naast je een E zijn!)
 - Options in playerprefs stoppen?
+- Begin/midden/eind aan breien
+	* Begin popup, start! (met uitleg)
+	* Eind popup, tijd + aantal fouten
+- Plaats camera goed na level generation (generator geeft bounds terug?)
+	* EN/OF Laat camera met character meepannen (deadzone etc, cinemachine)

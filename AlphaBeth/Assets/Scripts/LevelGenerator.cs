@@ -14,6 +14,9 @@ public class LevelGenerator : MonoBehaviour
     private Node m_NodePrefab;
     private List<Node> m_Nodes;
 
+    [SerializeField]
+    private PolygonCollider2D m_CameraCollider;
+
     private Node m_StartNode;
     public Node StartNode
     {
@@ -110,6 +113,27 @@ public class LevelGenerator : MonoBehaviour
         int randEndQuadrant = Random.Range(0, quadrants.Count);
         m_EndNode = GetRandomNodeInQuadrant(width, height, quadrants[randEndQuadrant]);
         m_EndNode.SetExit(true); //Visualize
+
+        //Calculcate the collider bounds (so the camera doesn't go out of bounds
+        if (m_CameraCollider != null)
+        {
+            Vector3 topLeft = m_Nodes[0].transform.position;
+            Vector3 topRight = m_Nodes[width - 1].transform.position;
+            Vector3 bottomLeft = m_Nodes[(height * width) - width].transform.position;
+            Vector3 bottomRight = m_Nodes[(height * width) - 1].transform.position;
+
+            Vector2[] colliderPath = new Vector2[4];
+            colliderPath[0] = new Vector2(topLeft.x - (m_TileSize * 0.5f), topLeft.y + (m_TileSize * 0.5f));
+            colliderPath[1] = new Vector2(topRight.x + (m_TileSize * 0.5f), topRight.y + (m_TileSize * 0.5f));
+            colliderPath[2] = new Vector2(bottomRight.x + (m_TileSize * 0.5f), bottomRight.y - (m_TileSize * 0.5f));
+            colliderPath[3] = new Vector2(bottomLeft.x - (m_TileSize * 0.5f), bottomLeft.y - (m_TileSize * 0.5f));
+
+            m_CameraCollider.SetPath(0, colliderPath);
+
+            //Set ourselves to the center
+            Vector3 total = topLeft + topRight + bottomLeft + bottomRight;
+            transform.position = new Vector3(-total.x / 4.0f, -total.y / 4.0f, 0.0f);
+        }
 
         //Let the world know!
         if (LevelGeneratedEvent != null)
