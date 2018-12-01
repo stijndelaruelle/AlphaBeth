@@ -52,6 +52,13 @@ public class Node : MonoBehaviour
         SaveGameManager.BoolVariableChangedEvent -= OnSaveGameBoolVariableChanged;
     }
 
+    public bool CanAccess(char typedChar)
+    {
+        if (m_IsAccessible == false)
+            return false;
+
+        return (typedChar == m_TextCharacter);
+    }
 
     private void UpdateVisualText()
     {

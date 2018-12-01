@@ -53,7 +53,7 @@ public class Player : MonoBehaviour
                     if (neighbour != null)
                     {
                         //Yep this is the node we want to move to!
-                        if (pressendChar == neighbour.GetTextCharacter())
+                        if (neighbour.CanAccess(pressendChar))
                         {
                             SetNode(neighbour);
                             return;
