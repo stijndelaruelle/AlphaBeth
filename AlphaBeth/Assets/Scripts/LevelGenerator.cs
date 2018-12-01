@@ -74,7 +74,7 @@ public class LevelGenerator : MonoBehaviour
 
             newNode.name = "Node (" + x + ", " + y + ")";
             newNode.transform.parent = transform;
-            newNode.transform.position = new Vector3(x * m_TileSize, -y * m_TileSize, 0.0f); //0, 0 in the top left
+            newNode.transform.localPosition = new Vector3(x * m_TileSize, -y * m_TileSize, 0.0f); //0, 0 in the top left
 
             m_Nodes.Add(newNode);
         }
@@ -123,10 +123,10 @@ public class LevelGenerator : MonoBehaviour
         //Calculcate the collider bounds (so the camera doesn't go out of bounds
         if (m_CameraCollider != null)
         {
-            Vector3 topLeft = m_Nodes[0].transform.position;
-            Vector3 topRight = m_Nodes[width - 1].transform.position;
-            Vector3 bottomLeft = m_Nodes[(height * width) - width].transform.position;
-            Vector3 bottomRight = m_Nodes[(height * width) - 1].transform.position;
+            Vector3 topLeft = m_Nodes[0].transform.localPosition;
+            Vector3 topRight = m_Nodes[width - 1].transform.localPosition;
+            Vector3 bottomLeft = m_Nodes[(height * width) - width].transform.localPosition;
+            Vector3 bottomRight = m_Nodes[(height * width) - 1].transform.localPosition;
 
             Vector2[] colliderPath = new Vector2[4];
             colliderPath[0] = new Vector2(topLeft.x - (m_TileSize * 0.5f), topLeft.y + (m_TileSize * 0.5f));
