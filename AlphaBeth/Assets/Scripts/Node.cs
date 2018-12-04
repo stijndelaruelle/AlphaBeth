@@ -13,6 +13,8 @@ public enum Direction
 
 public class Node : MonoBehaviour
 {
+    public delegate void CharacterDelegate(Player player);
+
     [SerializeField]
     private TextMeshProUGUI m_Text;
 
@@ -30,6 +32,22 @@ public class Node : MonoBehaviour
     //Only used for the fog of war
     private bool m_IsExplored = false;
     private bool m_IsAccessible = true;
+    public bool IsAccessible
+    {
+        get { return m_IsAccessible; }
+        set { m_IsAccessible = value; } //Shouldn't be able to do that, super cheat for indie level
+    }
+
+    //Only for the super indie level
+    private bool m_IsVisible = true;
+    public bool IsVisible
+    {
+        get { return m_IsVisible; }
+        set { m_IsVisible = value; UpdateVisualText(); }
+    }
+
+    public event CharacterDelegate CharacterEnterEvent;
+    public event CharacterDelegate CharacterLeaveEvent;
 
     private void Awake()
     {
@@ -57,6 +75,9 @@ public class Node : MonoBehaviour
         if (m_IsAccessible == false)
             return false;
 
+        if (m_TextCharacter == '.')
+            return false;
+
         return (typedChar == m_TextCharacter);
     }
 
@@ -66,7 +87,7 @@ public class Node : MonoBehaviour
         if (m_Text == null)
             return;
 
-        m_Text.enabled = (m_Characters.Count == 0) && m_IsAccessible;
+        m_Text.enabled = (m_Characters.Count == 0) && (m_TextCharacter != '.') && m_IsAccessible && m_IsVisible;
 
         //Check if fog of war is enabled
         if (SaveGameManager.GetBool(SaveGameManager.SAVE_OPTION_FOGOFWAR, true))
@@ -151,12 +172,20 @@ public class Node : MonoBehaviour
         }
 
         UpdateVisualText();
+
+        //Let the world know
+        if (CharacterEnterEvent != null)
+            CharacterEnterEvent(player);
     }
 
     public void RemoveCharacter(Player player)
     {
         m_Characters.Remove(player);
         UpdateVisualText();
+
+        //Let the world know
+        if (CharacterLeaveEvent != null)
+            CharacterLeaveEvent(player);
     }
 
 
@@ -178,6 +207,7 @@ public class Node : MonoBehaviour
         //Level reset, so let's hide ourself
         m_IsExplored = false;
         m_IsAccessible = true;
+        m_IsVisible = true;
 
         UpdateVisualText();
     }

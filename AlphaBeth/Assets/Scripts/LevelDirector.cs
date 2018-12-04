@@ -14,6 +14,12 @@ public class LevelDirector : Singleton<LevelDirector>
     [SerializeField]
     private Player m_Player;
 
+    [SerializeField]
+    private bool m_GenerateGridAtStart = true;
+
+    [SerializeField]
+    private bool m_GenerateIndieLevelAtStart = false;
+
     //Simple system that allows windows/cutscenes/etc... to block player input.
     private int m_PlayerInputBlockers = 0;
     private bool m_IsLevelReady = false;
@@ -31,7 +37,11 @@ public class LevelDirector : Singleton<LevelDirector>
             m_LevelGenerator.LevelGeneratedEvent += OnLevelGenerated;
 
             //Generate a default level (so we don't start he game with the level settings menu open
-            m_LevelGenerator.GenerateGridLevel();
+            if (m_GenerateGridAtStart == true)
+                m_LevelGenerator.GenerateGridLevel();
+
+            if (m_GenerateIndieLevelAtStart == true)
+                m_LevelGenerator.GenerateIndieLevel();
         }
 
         if (m_Player != null)
@@ -64,7 +74,8 @@ public class LevelDirector : Singleton<LevelDirector>
             LevelStartEvent();
 
         //Reset player position (after event because of fog of war sequencing). This may bite us later on
-        m_Player.SetNode(m_LevelGenerator.StartNode);
+        if (m_Player != null && m_LevelGenerator != null)
+            m_Player.SetNode(m_LevelGenerator.StartNode);
     }
 
     //Input Blocker
@@ -107,6 +118,7 @@ public class LevelDirector : Singleton<LevelDirector>
         if (SaveGameManager.GetBool(SaveGameManager.SAVE_OPTION_NEWCHARSONMISTAKE, true) == false)
             return;
 
-        m_LevelGenerator.AssignNodeTextCharacters();
+        if (m_LevelGenerator != null)
+            m_LevelGenerator.AssignNodeTextCharacters();
     }
 }

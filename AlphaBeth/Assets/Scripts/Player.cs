@@ -11,6 +11,7 @@ public class Player : MonoBehaviour
 
     //Variable
     private Node m_CurrentNode;
+    private Direction m_LastDirection;
 
     //Events
     public event InputMistakeDelegate InputMistakeEvent;
@@ -47,15 +48,19 @@ public class Player : MonoBehaviour
             //Everything else
             else
             {
-                for (int i = 0; i <= (int)Direction.West; ++i)
+                for (int i = 0; i < 4; ++i)
                 {
-                    Node neighbour = m_CurrentNode.GetNeighbour((Direction)i);
+                    //Always check in the last chosen direction first, in case 2 neighbours have the same letter
+                    Direction currentDirection = (Direction)(((int)m_LastDirection + i) % 4);
+
+                    Node neighbour = m_CurrentNode.GetNeighbour(currentDirection);
                     if (neighbour != null)
                     {
                         //Yep this is the node we want to move to!
                         if (neighbour.CanAccess(pressendChar))
                         {
                             SetNode(neighbour);
+                            m_LastDirection = currentDirection;
                             return;
                         }
                     }

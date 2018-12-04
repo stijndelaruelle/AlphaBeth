@@ -13,6 +13,10 @@ public class LevelGenerator : MonoBehaviour
     [SerializeField]
     private Node m_NodePrefab;
     private List<Node> m_Nodes;
+    public List<Node> Nodes
+    {
+        get { return m_Nodes; }
+    }
 
     [SerializeField]
     private PolygonCollider2D m_CameraCollider;
@@ -52,6 +56,7 @@ public class LevelGenerator : MonoBehaviour
         //Temp, wait one frame so everyone has the time to do subscribe etc before a level actually get's generated
         //yield return new WaitForEndOfFrame();
 
+        //Get data
         int width = SaveGameManager.GetInt(SaveGameManager.SAVE_LEVEL_WIDTH, 5);
         int height = SaveGameManager.GetInt(SaveGameManager.SAVE_LEVEL_HEIGHT, 5);
         int seed = SaveGameManager.GetInt(SaveGameManager.SAVE_LEVEL_SEED, -1);
@@ -61,6 +66,7 @@ public class LevelGenerator : MonoBehaviour
         else
             Random.InitState(seed);
 
+        //Clear Level if needed
         if (m_Nodes == null) { m_Nodes = new List<Node>(); }
         else { ClearLevel(); }
 
@@ -120,7 +126,7 @@ public class LevelGenerator : MonoBehaviour
         m_EndNode = GetRandomNodeInQuadrant(width, height, quadrants[randEndQuadrant]);
         m_EndNode.SetExit(true); //Visualize
 
-        //Calculcate the collider bounds (so the camera doesn't go out of bounds
+        //Calculcate the collider bounds (so the camera doesn't go out of bounds)
         if (m_CameraCollider != null)
         {
             Vector3 topLeft = m_Nodes[0].transform.localPosition;
@@ -140,6 +146,124 @@ public class LevelGenerator : MonoBehaviour
             Vector3 total = topLeft + topRight + bottomLeft + bottomRight;
             transform.position = new Vector3(-total.x / 4.0f, -total.y / 4.0f, 0.0f);
         }
+
+        //Let the world know!
+        if (LevelGeneratedEvent != null)
+            LevelGeneratedEvent();
+
+        m_CurrentRoutine = null;
+
+        yield return null;
+    }
+
+
+    public void GenerateIndieLevel()
+    {
+        if (m_NodePrefab == null)
+        {
+            Debug.LogWarning("Please assign a node prefab.");
+            return;
+        }
+
+        if (m_CurrentRoutine != null)
+            StopCoroutine(m_CurrentRoutine);
+
+        m_CurrentRoutine = StartCoroutine(GenerateIndieLevelRoutine());
+    }
+
+    public IEnumerator GenerateIndieLevelRoutine()
+    {
+        //Get data (this should all come from a file)
+        int width = 13;
+        int height = 22;
+
+        string levelData =
+            @"......s......
+              ......l......
+              ......e......
+              ......d......
+              ......a......
+              ......d......
+              iaawalrzwanen
+              ......a......
+              ......a......
+              ......m......
+              ......n......
+              ......e......
+              ......d......
+              ......r......
+              ......o......
+              ......o......
+              ......w......
+              ......n......
+              ......e......
+              ......e......
+              ......g......
+              .............";
+
+        levelData = levelData.Replace("\r\n", ""); //Remove the enters
+        levelData = levelData.Replace(" ", ""); //Remove all the extra spaces
+
+        //char[] levelData = new char[] { '.', '.', '.', '.', '.',
+        //                                'g', 'e', 'e', 'n', '.' };
+
+        //Clear Level if needed
+        if (m_Nodes == null) { m_Nodes = new List<Node>(); }
+        else { ClearLevel(); }
+
+        //Create all the nodes
+        for (int i = 0; i < levelData.Length; ++i)
+        {
+            int x = (i % width);
+            int y = (i / width);
+
+            Node newNode = GameObject.Instantiate<Node>(m_NodePrefab);
+
+            newNode.name = "Node (" + x + ", " + y + ")";
+            newNode.transform.parent = transform;
+            newNode.transform.localPosition = new Vector3(x * m_TileSize, -y * m_TileSize, 0.0f); //0, 0 in the top left
+
+            //Set letter
+            newNode.SetTextCharacter(levelData[i]);
+
+            if (levelData[i] != '.')
+                newNode.name = newNode.name + " - " + newNode.GetTextCharacter();
+
+            m_Nodes.Add(newNode);
+        }
+
+        //Link all the nodes (empty tiles shouldn't be here, but for now this is easier!)
+        for (int i = 0; i < m_Nodes.Count; ++i)
+        {
+            Node currentNode = m_Nodes[i];
+
+            int x = (i % width);
+            int y = (i / width);
+
+            //Assign right neighbour (and assign their left to us)
+            if (x >= 0 && x < width - 1)
+            {
+                Node rightNeighbour = m_Nodes[i + 1];
+                currentNode.SetNeighbour(Direction.East, rightNeighbour);
+                rightNeighbour.SetNeighbour(Direction.West, currentNode);
+            }
+
+            //Assign bottom neighbour (and assign their top to us)
+            if (y >= 0 && y < height - 1)
+            {
+                Node bottomNeighbour = m_Nodes[i + width];
+                currentNode.SetNeighbour(Direction.South, bottomNeighbour);
+                bottomNeighbour.SetNeighbour(Direction.North, currentNode);
+            }
+        }
+
+        //Assign start node
+        m_StartNode = m_Nodes[m_Nodes.Count - 7];
+
+        //Assign end node
+        //m_EndNode
+
+        //Calculcate the collider bounds (so the camera doesn't go out of bounds)
 
         //Let the world know!
         if (LevelGeneratedEvent != null)
