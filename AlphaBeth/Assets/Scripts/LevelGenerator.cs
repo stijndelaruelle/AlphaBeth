@@ -1,6 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
 
 public class LevelGenerator : MonoBehaviour
 {
@@ -37,7 +39,7 @@ public class LevelGenerator : MonoBehaviour
     public event LevelDelegate LevelGeneratedEvent;
     
 
-    public void GenerateGridLevel()
+    public void GenerateLevelFromGrid()
     {
         if (m_NodePrefab == null)
         {
@@ -48,13 +50,13 @@ public class LevelGenerator : MonoBehaviour
         if (m_CurrentRoutine != null)
             StopCoroutine(m_CurrentRoutine);
 
-        m_CurrentRoutine = StartCoroutine(GenerateGridLevelRoutine());
+        m_CurrentRoutine = StartCoroutine(GenerateLevelFromGridRoutine());
     }
 
-    private IEnumerator GenerateGridLevelRoutine()
+    private IEnumerator GenerateLevelFromGridRoutine()
     {
         //Temp, wait one frame so everyone has the time to do subscribe etc before a level actually get's generated
-        //yield return new WaitForEndOfFrame();
+        yield return new WaitForEndOfFrame();
 
         //Get data
         int width = SaveGameManager.GetInt(SaveGameManager.SAVE_LEVEL_WIDTH, 5);
@@ -62,9 +64,9 @@ public class LevelGenerator : MonoBehaviour
         int seed = SaveGameManager.GetInt(SaveGameManager.SAVE_LEVEL_SEED, -1);
 
         if (seed == -1)
-            Random.InitState(System.Environment.TickCount); //Random enough?
+            UnityEngine.Random.InitState(System.Environment.TickCount); //Random enough?
         else
-            Random.InitState(seed);
+            UnityEngine.Random.InitState(seed);
 
         //Clear Level if needed
         if (m_Nodes == null) { m_Nodes = new List<Node>(); }
@@ -116,13 +118,13 @@ public class LevelGenerator : MonoBehaviour
         //Assign start node
         List<int> quadrants = new List<int> { 0, 1, 2, 3 };
 
-        int randStartQuadrant = Random.Range(0, quadrants.Count);
+        int randStartQuadrant = UnityEngine.Random.Range(0, quadrants.Count);
         m_StartNode = GetRandomNodeInQuadrant(width, height, quadrants[randStartQuadrant]);
 
         //Assign end node
         quadrants.Remove(randStartQuadrant); //Make sure the end quadrant is not the same as the start one
 
-        int randEndQuadrant = Random.Range(0, quadrants.Count);
+        int randEndQuadrant = UnityEngine.Random.Range(0, quadrants.Count);
         m_EndNode = GetRandomNodeInQuadrant(width, height, quadrants[randEndQuadrant]);
         m_EndNode.SetExit(true); //Visualize
 
@@ -157,7 +159,7 @@ public class LevelGenerator : MonoBehaviour
     }
 
 
-    public void GenerateIndieLevel()
+    public void GenerateLevelFromFile(string filePath)
     {
         if (m_NodePrefab == null)
         {
@@ -168,44 +170,35 @@ public class LevelGenerator : MonoBehaviour
         if (m_CurrentRoutine != null)
             StopCoroutine(m_CurrentRoutine);
 
-        m_CurrentRoutine = StartCoroutine(GenerateIndieLevelRoutine());
+        m_CurrentRoutine = StartCoroutine(GenerateLevelFromFileRoutine(filePath));
     }
 
-    public IEnumerator GenerateIndieLevelRoutine()
+    public IEnumerator GenerateLevelFromFileRoutine(string filePath)
     {
-        //Get data (this should all come from a file)
-        int width = 13;
-        int height = 22;
+        //Temp, wait one frame so everyone has the time to do subscribe etc before a level actually get's generated
+        yield return new WaitForEndOfFrame();
 
-        string levelData =
-            @"......s......
-              ......l......
-              ......e......
-              ......d......
-              ......a......
-              ......d......
-              iaawalrzwanen
-              ......a......
-              ......a......
-              ......m......
-              ......n......
-              ......e......
-              ......d......
-              ......r......
-              ......o......
-              ......o......
-              ......w......
-              ......n......
-              ......e......
-              ......e......
-              ......g......
-              .............";
+        //Load the level from the file
+        string levelData = "";
+        try
+        {
+            levelData = File.ReadAllText(filePath, System.Text.Encoding.UTF8);
+        }
+        catch (Exception e)
+        {
+            //The file was not found, but that shouldn't crash the game!
+            Debug.LogError(e.Message);
+        }
 
+        if (levelData == "")
+            yield return null;
+
+        int width = levelData.IndexOf('\r');
+        
         levelData = levelData.Replace("\r\n", ""); //Remove the enters
         levelData = levelData.Replace(" ", ""); //Remove all the extra spaces
 
-        //char[] levelData = new char[] { '.', '.', '.', '.', '.',
-        //                                'g', 'e', 'e', 'n', '.' };
+        int height = levelData.Length / width;
 
         //Clear Level if needed
         if (m_Nodes == null) { m_Nodes = new List<Node>(); }
@@ -293,9 +286,9 @@ public class LevelGenerator : MonoBehaviour
         ClearNodeTextCharacters();
 
         if (seed == -1)
-            Random.InitState(System.Environment.TickCount); //Random enough?
+            UnityEngine.Random.InitState(System.Environment.TickCount); //Random enough?
         else
-            Random.InitState(seed);
+            UnityEngine.Random.InitState(seed);
 
         //Give all the nodes a random character
         for (int i = 0; i < m_Nodes.Count; ++i)
@@ -333,7 +326,7 @@ public class LevelGenerator : MonoBehaviour
             if (availableTextCharactersList.Count > 0)
             {
                 //Pick a random character from the remaining list and assign it
-                int randInt = Random.Range(0, availableTextCharactersList.Count);
+                int randInt = UnityEngine.Random.Range(0, availableTextCharactersList.Count);
                 currentNode.SetTextCharacter(availableTextCharactersList[randInt]);
 
                 currentNode.name = currentNode.name + " - " + currentNode.GetTextCharacter();
@@ -366,7 +359,7 @@ public class LevelGenerator : MonoBehaviour
 
         int maxStartX = minStartX + quadrandWidth; //-1, but because Random.Range is exclusive, we don't bother
 
-        int randStartX = Random.Range(minStartX, maxStartX);
+        int randStartX = UnityEngine.Random.Range(minStartX, maxStartX);
 
         //Y
         bool isHeightOdd = ((height % 2) != 0);
@@ -379,7 +372,7 @@ public class LevelGenerator : MonoBehaviour
 
         int maxStartY = minStartY + quadrantHeight; //-1, but because Random.Range is exclusive, we don't bother
 
-        int randStartY = Random.Range(minStartY, maxStartY);
+        int randStartY = UnityEngine.Random.Range(minStartY, maxStartY);
 
         //Combine into a node ID
         int nodeID = randStartX + (randStartY * width);

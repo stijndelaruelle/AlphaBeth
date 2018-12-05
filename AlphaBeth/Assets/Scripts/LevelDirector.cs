@@ -15,10 +15,7 @@ public class LevelDirector : Singleton<LevelDirector>
     private Player m_Player;
 
     [SerializeField]
-    private bool m_GenerateGridAtStart = true;
-
-    [SerializeField]
-    private bool m_GenerateIndieLevelAtStart = false;
+    private string m_LevelFileName = "";
 
     //Simple system that allows windows/cutscenes/etc... to block player input.
     private int m_PlayerInputBlockers = 0;
@@ -37,11 +34,14 @@ public class LevelDirector : Singleton<LevelDirector>
             m_LevelGenerator.LevelGeneratedEvent += OnLevelGenerated;
 
             //Generate a default level (so we don't start he game with the level settings menu open
-            if (m_GenerateGridAtStart == true)
-                m_LevelGenerator.GenerateGridLevel();
-
-            if (m_GenerateIndieLevelAtStart == true)
-                m_LevelGenerator.GenerateIndieLevel();
+            if (m_LevelFileName != "")
+            {
+                m_LevelGenerator.GenerateLevelFromFile(m_LevelFileName);
+            }
+            else
+            {
+                m_LevelGenerator.GenerateLevelFromGrid();
+            }
         }
 
         if (m_Player != null)

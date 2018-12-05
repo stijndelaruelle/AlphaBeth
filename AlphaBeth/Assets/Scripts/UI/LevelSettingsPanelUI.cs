@@ -112,7 +112,7 @@ public class LevelSettingsPanelUI : MonoBehaviour
             SaveGameManager.SetInt(SaveGameManager.SAVE_LEVEL_SEED, seed);
 
         m_LevelGenerator.LevelGeneratedEvent += OnLevelGeneratedTroughUs;
-        m_LevelGenerator.GenerateGridLevel();
+        m_LevelGenerator.GenerateLevelFromGrid();
     }
 
     private IEnumerator SelectButtonRoutine()
