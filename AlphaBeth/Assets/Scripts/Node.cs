@@ -22,12 +22,19 @@ public class Node : MonoBehaviour
     [SerializeField]
     private SpriteRenderer m_Sprite;
 
+    [SerializeField] //Mostly so it get's remembered after making a prefab
     private char m_TextCharacter = '\0';
 
+    [SerializeField] //Mostly so it get's remembered after making a prefab
     private Node[] m_Neighbours = new Node[4]; //Currently 4, could become 8
     private List<Character> m_Characters;
+    public List<Character> Characters
+    {
+        get { return m_Characters; }
+    }
 
     //Temp, just to visualise where the exit is, this should become a level object at some point (just like HackShield)
+    [SerializeField] //Mostly so it get's remembered after making a prefab
     private bool m_IsExit = false;
     public bool IsExit
     {
@@ -171,6 +178,7 @@ public class Node : MonoBehaviour
     public void AddCharacter(Character character)
     {
         m_Characters.Add(character);
+        UpdateVisualText();
 
         //Let the world know
         if (CharacterEnterEvent != null)
@@ -180,6 +188,7 @@ public class Node : MonoBehaviour
     public void RemoveCharacter(Character character)
     {
         m_Characters.Remove(character);
+        UpdateVisualText();
 
         //Let the world know
         if (CharacterLeaveEvent != null)
@@ -206,24 +215,16 @@ public class Node : MonoBehaviour
             m_IsAccessible = false;
         }
 
-        UpdateVisualText();
-
         //Let the world know
         if (PlayerEnterEvent != null)
             PlayerEnterEvent(player);
-
-        AddCharacter(player);
     }
 
     public void RemovePlayer(Player player)
     {
-        UpdateVisualText();
-
         //Let the world know
         if (PlayerLeaveEvent != null)
             PlayerLeaveEvent(player);
-
-        RemoveCharacter(player);
     }
 
    
@@ -246,6 +247,8 @@ public class Node : MonoBehaviour
         m_IsExplored = false;
         m_IsAccessible = true;
         m_IsVisible = true;
+
+        m_Characters.Clear();
 
         UpdateVisualText();
     }

@@ -38,6 +38,30 @@ public class LevelGenerator : MonoBehaviour
     private Coroutine m_CurrentRoutine;
     public event LevelDelegate LevelGeneratedEvent;
     
+    public void GenerateLevelFromChildren()
+    {
+        if (m_CurrentRoutine != null)
+            StopCoroutine(m_CurrentRoutine);
+
+        m_CurrentRoutine = StartCoroutine(GenerateLevelFromChildrenRoutine());
+    }
+
+    private IEnumerator GenerateLevelFromChildrenRoutine()
+    {
+        //Temp, wait one frame so everyone has the time to do subscribe etc before a level actually get's generated
+        yield return new WaitForEndOfFrame();
+
+        //Just get all our childnodes, the level was already cooked
+        m_Nodes = new List<Node>(GetComponentsInChildren<Node>());
+
+        //Let the world know!
+        if (LevelGeneratedEvent != null)
+            LevelGeneratedEvent();
+
+        m_CurrentRoutine = null;
+
+        yield return null;
+    }
 
     public void GenerateLevelFromGrid()
     {

@@ -42,7 +42,7 @@ public class LevelDirector : Singleton<LevelDirector>
             }
             else
             {
-                m_LevelGenerator.GenerateLevelFromGrid();
+                m_LevelGenerator.GenerateLevelFromChildren();
             }
         }
 
@@ -78,7 +78,7 @@ public class LevelDirector : Singleton<LevelDirector>
             LevelStartEvent();
 
         //Reset player position (after event because of fog of war sequencing). This may bite us later on
-        if (m_Player != null && m_LevelGenerator != null)
+        if (m_Player != null && m_LevelGenerator != null && m_LevelGenerator.StartNode != null)
             m_Player.SetNode(m_LevelGenerator.StartNode);
     }
 

@@ -5,16 +5,13 @@ using UnityEngine;
 public class Player : Character
 {
     //Delegates
-    public delegate void CharacterMoveDelegate(Node newNode);
     public delegate void PlayerInputMistakeDelegate();
     public delegate void PlayerReachedExitDelegate();
         
-    //Variable
-    private Node m_CurrentNode;
+    //Variables
     private Direction m_LastDirection;
 
     //Events
-    public event CharacterMoveDelegate MoveEvent;
     public event PlayerInputMistakeDelegate InputMistakeEvent;
     public event PlayerReachedExitDelegate ReachedExitEvent;
 
@@ -82,16 +79,20 @@ public class Player : Character
         }
     }
 
-    public void SetNode(Node node)
+    public override void SetNode(Node node)
     {
         if (m_CurrentNode != null)
             m_CurrentNode.RemovePlayer(this);
 
-        m_CurrentNode = node;
-        m_CurrentNode.AddPlayer(this);
+        //Change the current node
+        base.SetNode(node);
 
-        if (MoveEvent != null)
-            MoveEvent(m_CurrentNode);
+        m_CurrentNode = node;
+
+        if (m_CurrentNode == null)
+            return;
+
+        m_CurrentNode.AddPlayer(this);
 
         //Temp, should become a separate exit tile (just like HackShield)
         if (m_CurrentNode.IsExit)
