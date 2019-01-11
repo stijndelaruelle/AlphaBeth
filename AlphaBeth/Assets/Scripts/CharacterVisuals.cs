@@ -8,12 +8,8 @@ public class CharacterVisuals : MonoBehaviour
     [SerializeField]
     private Character m_Character;
 
-    private Vector3 m_Offset;
-
     private void Start()
     {
-        m_Offset = new Vector3(transform.localPosition.x, transform.localPosition.y, transform.localPosition.z);
-
         if (m_Character != null)
         {
             OnCharacterMove(m_Character.CurrentNode);
@@ -30,6 +26,6 @@ public class CharacterVisuals : MonoBehaviour
     private void OnCharacterMove(Node newNode)
     {
         if (newNode != null)
-            transform.DOMove(newNode.transform.position + m_Offset, 0.1f).SetEase(Ease.InOutElastic, 0.5f, 0.0f);
+            m_Character.transform.DOMove(newNode.transform.position, 0.1f).SetEase(Ease.InOutElastic, 0.5f, 0.0f);
     }
 }

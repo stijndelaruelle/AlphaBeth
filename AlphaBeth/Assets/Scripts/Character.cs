@@ -17,6 +17,12 @@ public class Character : MonoBehaviour
         get { return m_CurrentNode; }
     }
 
+    private bool m_IsDead = false;
+    public bool IsDead
+    {
+        get { return m_IsDead; }
+    }
+
     //Events
     public event CharacterMoveDelegate MoveEvent;
     public event CharacterDeathDelegate DeathEvent;
@@ -57,7 +63,10 @@ public class Character : MonoBehaviour
     //Should be splitted into a healbar script? (IDamageable)
     public void Die()
     {
-        SetNode(null);
+        if (m_IsDead)
+            return;
+
+        m_IsDead = true;
 
         //We don't track the death state or anything right now.
         if (DeathEvent != null)
@@ -69,5 +78,7 @@ public class Character : MonoBehaviour
         //Reset tile
         m_CurrentNode = m_StartNode;
         SetNode(m_StartNode);
+
+        m_IsDead = false;
     }
 }
