@@ -2,26 +2,35 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class Player : Character
 {
     //Delegates
-    public delegate void InputMistakeDelegate();
-    public delegate void ReachedExitDelegate();
-    public delegate void MoveDelegate(Node newNode);
-
+    public delegate void CharacterMoveDelegate(Node newNode);
+    public delegate void PlayerInputMistakeDelegate();
+    public delegate void PlayerReachedExitDelegate();
+        
     //Variable
     private Node m_CurrentNode;
     private Direction m_LastDirection;
 
     //Events
-    public event InputMistakeDelegate InputMistakeEvent;
-    public event ReachedExitDelegate ReachedExitEvent;
-    public event MoveDelegate MoveEvent;
+    public event CharacterMoveDelegate MoveEvent;
+    public event PlayerInputMistakeDelegate InputMistakeEvent;
+    public event PlayerReachedExitDelegate ReachedExitEvent;
 
     //Functions
     private void Update()
     {
+        HandleInput();
         HandleMovement();
+    }
+
+    private void HandleInput()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Die();
+        }
     }
 
     private void HandleMovement()
@@ -76,10 +85,10 @@ public class Player : MonoBehaviour
     public void SetNode(Node node)
     {
         if (m_CurrentNode != null)
-            m_CurrentNode.RemoveCharacter(this);
+            m_CurrentNode.RemovePlayer(this);
 
         m_CurrentNode = node;
-        m_CurrentNode.AddCharacter(this);
+        m_CurrentNode.AddPlayer(this);
 
         if (MoveEvent != null)
             MoveEvent(m_CurrentNode);

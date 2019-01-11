@@ -283,7 +283,15 @@ public class LevelGenerator : MonoBehaviour
     {
         string availableTextCharacters = SaveGameManager.GetString(SaveGameManager.SAVE_LEVEL_TEXTCHARACTERS, "sdfghjkl");
 
-        ClearNodeTextCharacters();
+        //Only assign characters to tiles that are not empty
+        List<Node> nodesToAssign = new List<Node>(m_Nodes);
+        for (int i = nodesToAssign.Count - 1; i >= 0; --i)
+        {
+            if (nodesToAssign[i].IsEmpty())
+                nodesToAssign.RemoveAt(i);
+        }
+
+        //ClearNodeTextCharacters();
 
         if (seed == -1)
             UnityEngine.Random.InitState(System.Environment.TickCount); //Random enough?
@@ -291,10 +299,8 @@ public class LevelGenerator : MonoBehaviour
             UnityEngine.Random.InitState(seed);
 
         //Give all the nodes a random character
-        for (int i = 0; i < m_Nodes.Count; ++i)
+        foreach (Node currentNode in nodesToAssign)
         {
-            Node currentNode = m_Nodes[i];
-
             //Create an array of all still available characters
             List<char> availableTextCharactersList = new List<char>(availableTextCharacters.ToCharArray());
 

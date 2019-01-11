@@ -44,9 +44,9 @@ public class IndieLevelScript : MonoBehaviour
 
         m_Nodes = m_LevelGenerator.Nodes;
 
-        m_Nodes[6].CharacterEnterEvent += OnPlayerFinishedDadels;
-        m_Nodes[78].CharacterEnterEvent += OnPlayerFinishedLaweit;
-        m_Nodes[90].CharacterEnterEvent += OnPlayerFinishedZwanen;
+        m_Nodes[6].PlayerEnterEvent += OnPlayerFinishedDadels;
+        m_Nodes[78].PlayerEnterEvent += OnPlayerFinishedLaweit;
+        m_Nodes[90].PlayerEnterEvent += OnPlayerFinishedZwanen;
     }
 
     private void OnLevelStart()
@@ -106,19 +106,19 @@ public class IndieLevelScript : MonoBehaviour
     }
 
 
-    private void OnPlayerFinishedDadels(Player player)
+    private void OnPlayerFinishedDadels(Character player)
     {
         Debug.Log("Dadels!");
         ConvertLevelForStage2(m_Nodes[6], m_DadelPrefab);
     }
 
-    private void OnPlayerFinishedZwanen(Player player)
+    private void OnPlayerFinishedZwanen(Character player)
     {
         Debug.Log("Zwanen!");
         ConvertLevelForStage2(m_Nodes[90], m_ZwaanPrefab);
     }
 
-    private void OnPlayerFinishedLaweit(Player player)
+    private void OnPlayerFinishedLaweit(Character player)
     {
         Debug.Log("Laweit!");
         ConvertLevelForStage2(m_Nodes[78], m_LaweitPrefab);

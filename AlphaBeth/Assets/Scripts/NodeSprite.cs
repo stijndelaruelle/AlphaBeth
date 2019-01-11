@@ -11,7 +11,7 @@ public class NodeSprite : MonoBehaviour
         m_Node = node;
 
         if (m_Node != null)
-            m_Node.CharacterEnterEvent += OnCharacterEnter;
+            m_Node.PlayerEnterEvent += OnCharacterEnter;
 
         transform.parent = node.gameObject.transform;
         transform.localPosition = Vector3.zero;
@@ -21,10 +21,10 @@ public class NodeSprite : MonoBehaviour
     private void OnDestroy()
     {
         if (m_Node != null)
-            m_Node.CharacterEnterEvent -= OnCharacterEnter;
+            m_Node.PlayerEnterEvent -= OnCharacterEnter;
     }
 
-    private void OnCharacterEnter(Player player)
+    private void OnCharacterEnter(Character player)
     {
         gameObject.SetActive(false);
     }

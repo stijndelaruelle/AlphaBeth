@@ -8,8 +8,12 @@ public class PlayerVisuals : MonoBehaviour
     [SerializeField]
     private Player m_Player;
 
+    private Vector3 m_Offset;
+
     private void Start()
     {
+        m_Offset = new Vector3(transform.localPosition.x, transform.localPosition.y, transform.localPosition.z);
+
         if (m_Player != null)
             m_Player.MoveEvent += OnPlayerMove;
     }
@@ -22,6 +26,6 @@ public class PlayerVisuals : MonoBehaviour
 
     private void OnPlayerMove(Node newNode)
     {
-        transform.DOMove(newNode.transform.position, 0.1f).SetEase(Ease.InOutElastic, 0.5f, 0.0f);
+        transform.DOMove(newNode.transform.position + m_Offset, 0.1f).SetEase(Ease.InOutElastic, 0.5f, 0.0f);
     }
 }

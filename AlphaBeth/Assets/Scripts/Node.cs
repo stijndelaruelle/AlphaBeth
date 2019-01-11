@@ -13,14 +13,19 @@ public enum Direction
 
 public class Node : MonoBehaviour
 {
-    public delegate void CharacterDelegate(Player player);
+    public delegate void CharacterDelegate(Character player);
+    public delegate void PlayerDelegate(Player player);
 
     [SerializeField]
     private TextMeshProUGUI m_Text;
 
+    [SerializeField]
+    private SpriteRenderer m_Sprite;
+
     private char m_TextCharacter = '\0';
+
     private Node[] m_Neighbours = new Node[4]; //Currently 4, could become 8
-    private List<Player> m_Characters; //For now this is only the player, change to a more generic "character" once we start addng enemies
+    private List<Character> m_Characters;
 
     //Temp, just to visualise where the exit is, this should become a level object at some point (just like HackShield)
     private bool m_IsExit = false;
@@ -49,9 +54,12 @@ public class Node : MonoBehaviour
     public event CharacterDelegate CharacterEnterEvent;
     public event CharacterDelegate CharacterLeaveEvent;
 
+    public event PlayerDelegate PlayerEnterEvent;
+    public event PlayerDelegate PlayerLeaveEvent;
+
     private void Awake()
     {
-        m_Characters = new List<Player>();
+        m_Characters = new List<Character>();
     }
 
     private void Start()
@@ -75,7 +83,7 @@ public class Node : MonoBehaviour
         if (m_IsAccessible == false)
             return false;
 
-        if (m_TextCharacter == '.')
+        if (IsEmpty())
             return false;
 
         return (typedChar == m_TextCharacter);
@@ -116,10 +124,17 @@ public class Node : MonoBehaviour
         }
     }
 
+    private void UpdateSprite()
+    {
+        m_Sprite.enabled = (m_Characters.Count == 0) && (m_TextCharacter != '.'); //TEMP
+        m_Sprite.sortingOrder = -100 - ((int)(transform.position.y) * 2) + (int)(transform.position.x);
+    }
+
     public void SetTextCharacter(char textChar)
     {
         m_TextCharacter = textChar;
         UpdateVisualText();
+        UpdateSprite();
     }
 
     public char GetTextCharacter()
@@ -127,6 +142,10 @@ public class Node : MonoBehaviour
         return m_TextCharacter;
     }
 
+    public bool IsEmpty()
+    {
+        return (m_TextCharacter == '.');
+    }
 
     public void SetNeighbour(Direction direction, Node neighbour)
     {
@@ -149,10 +168,26 @@ public class Node : MonoBehaviour
     }
 
 
-    public void AddCharacter(Player player)
+    public void AddCharacter(Character character)
     {
-        m_Characters.Add(player);
+        m_Characters.Add(character);
 
+        //Let the world know
+        if (CharacterEnterEvent != null)
+            CharacterEnterEvent(character);
+    }
+
+    public void RemoveCharacter(Character character)
+    {
+        m_Characters.Remove(character);
+
+        //Let the world know
+        if (CharacterLeaveEvent != null)
+            CharacterLeaveEvent(character);
+    }
+
+    public void AddPlayer(Player player)
+    {
         //We do this even if fog of war is currently disabled (so we can enable it at any time)
         m_IsExplored = true;
 
@@ -174,21 +209,24 @@ public class Node : MonoBehaviour
         UpdateVisualText();
 
         //Let the world know
-        if (CharacterEnterEvent != null)
-            CharacterEnterEvent(player);
+        if (PlayerEnterEvent != null)
+            PlayerEnterEvent(player);
+
+        AddCharacter(player);
     }
 
-    public void RemoveCharacter(Player player)
+    public void RemovePlayer(Player player)
     {
-        m_Characters.Remove(player);
         UpdateVisualText();
 
         //Let the world know
-        if (CharacterLeaveEvent != null)
-            CharacterLeaveEvent(player);
+        if (PlayerLeaveEvent != null)
+            PlayerLeaveEvent(player);
+
+        RemoveCharacter(player);
     }
 
-
+   
     public void SetExit(bool state)
     {
         m_IsExit = state;

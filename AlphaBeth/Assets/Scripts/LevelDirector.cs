@@ -6,7 +6,8 @@ public class LevelDirector : Singleton<LevelDirector>
 {
     public delegate void LevelReadyDelegate();
     public delegate void LevelStartDelegate();
-    public delegate void LevelEndDelegate();
+    public delegate void LevelCompleteDelegate();
+    public delegate void LevelFailedeDelegate();
 
     [SerializeField]
     private LevelGenerator m_LevelGenerator;
@@ -23,7 +24,8 @@ public class LevelDirector : Singleton<LevelDirector>
 
     public event LevelReadyDelegate LevelReadyEvent;
     public event LevelStartDelegate LevelStartEvent;
-    public event LevelEndDelegate LevelEndEvent;
+    public event LevelCompleteDelegate LevelCompleteEvent;
+    public event LevelFailedeDelegate LevelFailedEvent;
 
     private void Start()
     {
@@ -47,6 +49,7 @@ public class LevelDirector : Singleton<LevelDirector>
         if (m_Player != null)
         {
             m_Player.ReachedExitEvent += OnPlayerReachedExit;
+            m_Player.DeathEvent += OnPlayerDeath;
             m_Player.InputMistakeEvent += OnPlayerInputMistake;
         }
     }
@@ -61,6 +64,7 @@ public class LevelDirector : Singleton<LevelDirector>
         if (m_Player != null)
         {
             m_Player.ReachedExitEvent -= OnPlayerReachedExit;
+            m_Player.DeathEvent -= OnPlayerDeath;
             m_Player.InputMistakeEvent -= OnPlayerInputMistake;
         }
     }
@@ -108,8 +112,8 @@ public class LevelDirector : Singleton<LevelDirector>
 
     private void OnPlayerReachedExit()
     {
-        if (LevelEndEvent != null)
-            LevelEndEvent();
+        if (LevelCompleteEvent != null)
+            LevelCompleteEvent();
     }
 
     private void OnPlayerInputMistake()
@@ -120,5 +124,11 @@ public class LevelDirector : Singleton<LevelDirector>
 
         if (m_LevelGenerator != null)
             m_LevelGenerator.AssignNodeTextCharacters();
+    }
+
+    private void OnPlayerDeath()
+    {
+        if (LevelFailedEvent != null)
+            LevelFailedEvent();
     }
 }

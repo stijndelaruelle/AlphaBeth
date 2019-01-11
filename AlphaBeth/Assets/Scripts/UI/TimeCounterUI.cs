@@ -23,7 +23,7 @@ public class TimeCounterUI : MonoBehaviour
         if (LevelDirector.Instance != null)
         {
             LevelDirector.Instance.LevelStartEvent += OnLevelStart;
-            LevelDirector.Instance.LevelEndEvent += OnLevelEnd;
+            LevelDirector.Instance.LevelCompleteEvent += OnLevelEnd;
         }
     }
 
@@ -32,7 +32,7 @@ public class TimeCounterUI : MonoBehaviour
         if (LevelDirector.Instance != null)
         {
             LevelDirector.Instance.LevelStartEvent -= OnLevelStart;
-            LevelDirector.Instance.LevelEndEvent -= OnLevelEnd;
+            LevelDirector.Instance.LevelCompleteEvent -= OnLevelEnd;
         }
     }
 
