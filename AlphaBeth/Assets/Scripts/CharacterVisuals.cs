@@ -26,6 +26,6 @@ public class CharacterVisuals : MonoBehaviour
     private void OnCharacterMove(Node newNode)
     {
         if (newNode != null)
-            m_Character.transform.DOMove(newNode.transform.position, 0.1f).SetEase(Ease.InOutElastic, 0.5f, 0.0f);
+            m_Character.transform.DOMove(newNode.transform.position, 0.15f).SetEase(Ease.InOutElastic, 0.5f, 0.15f);
     }
 }

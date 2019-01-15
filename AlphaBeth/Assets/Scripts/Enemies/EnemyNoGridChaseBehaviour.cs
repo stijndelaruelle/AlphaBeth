@@ -54,6 +54,11 @@ public class EnemyNoGridChaseBehaviour : EnemyBehaviour
         //We don't use nodes
     }
 
+    public override void OnExitNode(Node node)
+    {
+        //We don't use nodes
+    }
+
     public override void OnLevelStart()
     {
         m_Character.transform.position = m_OriginalPosition;

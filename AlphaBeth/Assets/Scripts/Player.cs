@@ -7,13 +7,18 @@ public class Player : Character
     //Delegates
     public delegate void PlayerInputMistakeDelegate();
     public delegate void PlayerReachedExitDelegate();
-        
+    public delegate void PlayerStartAttackDelegate();
+    public delegate void PlayerStopAttackDelegate();
+
     //Variables
     private Direction m_LastDirection;
 
     //Events
     public event PlayerInputMistakeDelegate InputMistakeEvent;
     public event PlayerReachedExitDelegate ReachedExitEvent;
+
+    public event PlayerStartAttackDelegate StartAttackEvent;
+    public event PlayerStopAttackDelegate StopAttackEvent;
 
     //Functions
     private void Update()
@@ -24,6 +29,18 @@ public class Player : Character
 
     private void HandleInput()
     {
+        if (Input.GetKeyDown(KeyCode.LeftShift))
+        {
+            if (StartAttackEvent != null)
+                StartAttackEvent();
+        }
+
+        if (Input.GetKeyUp(KeyCode.LeftShift))
+        {
+            if (StopAttackEvent != null)
+                StopAttackEvent();
+        }
+
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             Die();

@@ -71,17 +71,11 @@ public class Node : MonoBehaviour
 
     private void Start()
     {
-        if (LevelDirector.Instance != null)
-            LevelDirector.Instance.LevelStartEvent += OnLevelStart;
-
         SaveGameManager.BoolVariableChangedEvent += OnSaveGameBoolVariableChanged;  
     }
 
     private void OnDestroy()
     {
-        if (LevelDirector.Instance != null)
-            LevelDirector.Instance.LevelStartEvent -= OnLevelStart;
-
         SaveGameManager.BoolVariableChangedEvent -= OnSaveGameBoolVariableChanged;
     }
 
@@ -240,8 +234,7 @@ public class Node : MonoBehaviour
         UpdateVisualText();
     }
 
-    //Callbacks
-    private void OnLevelStart()
+    public void ResetNode()
     {
         //Level reset, so let's hide ourself
         m_IsExplored = false;
@@ -253,6 +246,7 @@ public class Node : MonoBehaviour
         UpdateVisualText();
     }
 
+    //Callbacks
     private void OnSaveGameBoolVariableChanged(string key, bool value)
     {
         if (key == SaveGameManager.SAVE_OPTION_FOGOFWAR)

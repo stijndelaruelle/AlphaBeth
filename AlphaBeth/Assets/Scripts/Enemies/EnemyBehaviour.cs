@@ -9,5 +9,6 @@ public abstract class EnemyBehaviour : MonoBehaviour
 
     public abstract void FrameUpdate();
     public abstract void OnEnterNode(Node node);
+    public abstract void OnExitNode(Node node);
     public abstract void OnLevelStart();
 }

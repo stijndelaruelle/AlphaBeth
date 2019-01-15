@@ -16,7 +16,7 @@ public class EnemyPatrolBehaviour : EnemyBehaviour
 
     [SerializeField]
     private List<Node> m_Path;
-    private int m_CurrentNodeID = 0;
+    private int m_PathID = 0;
 
     public override void Initialize(Character character)
     {
@@ -37,13 +37,13 @@ public class EnemyPatrolBehaviour : EnemyBehaviour
         if (m_UpdateTimer < 0.0f)
         {
             //Move the character
-            m_CurrentNodeID += 1;
+            m_PathID += 1;
 
-            if (m_CurrentNodeID >= m_Path.Count)
-                m_CurrentNodeID = 0;
+            if (m_PathID >= m_Path.Count)
+                m_PathID = 0;
 
             if (m_Path.Count > 0)
-                m_Character.SetNode(m_Path[m_CurrentNodeID]);
+                m_Character.SetNode(m_Path[m_PathID]);
 
             //Prepare for the next update
             m_UpdateTimer += m_UpdateTime; //If we were below 0, diminish that time from the next update.
@@ -66,11 +66,27 @@ public class EnemyPatrolBehaviour : EnemyBehaviour
             if (character != m_Character)
                 character.Die();
         }
+
+        //Subscribe so we get to know if somebody else enters our domain
+        node.CharacterEnterEvent += OnOtherCharacterEnterNode;
+    }
+
+    public override void OnExitNode(Node node)
+    {
+        if (node != null)
+            node.CharacterEnterEvent -= OnOtherCharacterEnterNode;
+    }
+
+    private void OnOtherCharacterEnterNode(Character character)
+    {
+        //Kill anyone that touches us!
+        if (character != m_Character)
+            character.Die();
     }
 
     public override void OnLevelStart()
     {
-        m_CurrentNodeID = 0;
+        m_PathID = 0;
         m_UpdateTimer = m_UpdateTime;
         m_DelayTimer = m_DelayTime;
     }

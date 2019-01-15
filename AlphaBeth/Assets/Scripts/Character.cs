@@ -34,7 +34,6 @@ public class Character : MonoBehaviour
             LevelDirector.Instance.LevelStartEvent += OnLevelStart;
         }
 
-        m_CurrentNode = m_StartNode;
         SetNode(m_StartNode);
     }
 
@@ -76,7 +75,6 @@ public class Character : MonoBehaviour
     protected virtual void OnLevelStart()
     {
         //Reset tile
-        m_CurrentNode = m_StartNode;
         SetNode(m_StartNode);
 
         m_IsDead = false;

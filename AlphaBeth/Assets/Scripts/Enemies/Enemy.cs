@@ -23,6 +23,9 @@ public class Enemy : Character
 
     public override void SetNode(Node node)
     {
+        if (m_CurrentNode != null && m_EnemyBehaviour != null)
+            m_EnemyBehaviour.OnExitNode(m_CurrentNode);
+
         base.SetNode(node);
 
         if (m_EnemyBehaviour != null)

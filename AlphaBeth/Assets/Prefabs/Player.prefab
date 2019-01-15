@@ -133,7 +133,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4513941747885834}
   - component: {fileID: 212973430808665608}
-  - component: {fileID: 114544867700538414}
+  - component: {fileID: 114497119760449408}
   m_Layer: 0
   m_Name: Player Visuals
   m_TagString: Untagged
@@ -264,7 +264,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_StartNode: {fileID: 0}
---- !u!114 &114544867700538414
+--- !u!114 &114497119760449408
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -272,10 +272,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1916632826279198}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fceb3ca49b6edd145b2bef0decd71df0, type: 3}
+  m_Script: {fileID: 11500000, guid: d530e9beb5bdc234d9620e173f962964, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Character: {fileID: 114452345117938170}
+  m_Player: {fileID: 114452345117938170}
+  m_SpriteRenderer: {fileID: 212973430808665608}
+  m_IdleSprite: {fileID: 21300000, guid: 234db1b8b618d244ca2d3f7f293334b4, type: 3}
+  m_AttackSprite: {fileID: 21300000, guid: 9d08207fed6b84447887dbf1ad46924c, type: 3}
 --- !u!114 &114579219470479394
 MonoBehaviour:
   m_ObjectHideFlags: 1

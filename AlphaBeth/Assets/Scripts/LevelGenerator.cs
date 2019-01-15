@@ -302,6 +302,16 @@ public class LevelGenerator : MonoBehaviour
         m_Nodes.Clear();
     }
 
+    public void ResetLevel()
+    {
+        if (m_Nodes == null)
+            return;
+
+        for (int i = 0; i < m_Nodes.Count; ++i)
+        {
+            m_Nodes[i].ResetNode();
+        }
+    }
 
     public void AssignNodeTextCharacters(int seed = -1)
     {

@@ -74,6 +74,10 @@ public class LevelDirector : Singleton<LevelDirector>
         if (m_IsLevelReady == false)
             return;
 
+        //Reset the level first!
+        if (m_LevelGenerator != null)
+            m_LevelGenerator.ResetLevel();
+
         if (LevelStartEvent != null)
             LevelStartEvent();
 
