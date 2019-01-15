@@ -11,17 +11,29 @@ public class EnemyPatrolBehaviour : EnemyBehaviour
     private float m_UpdateTimer;
 
     [SerializeField]
+    private float m_DelayTime;
+    private float m_DelayTimer;
+
+    [SerializeField]
     private List<Node> m_Path;
     private int m_CurrentNodeID = 0;
 
     public override void Initialize(Character character)
     {
         m_Character = character;
+
         m_UpdateTimer = m_UpdateTime;
+        m_DelayTimer = m_DelayTime;
     }
 
     public override void FrameUpdate()
     {
+        if (m_DelayTimer > 0.0f)
+        {
+            m_DelayTimer -= Time.deltaTime;
+            return;
+        }
+
         if (m_UpdateTimer < 0.0f)
         {
             //Move the character
@@ -60,5 +72,6 @@ public class EnemyPatrolBehaviour : EnemyBehaviour
     {
         m_CurrentNodeID = 0;
         m_UpdateTimer = m_UpdateTime;
+        m_DelayTimer = m_DelayTime;
     }
 }
