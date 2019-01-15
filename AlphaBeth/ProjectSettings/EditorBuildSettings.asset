@@ -9,6 +9,12 @@ EditorBuildSettings:
     path: Assets/Scenes/PrototypeScene.unity
     guid: 2cda990e2423bbf4892e6590ba056729
   - enabled: 1
-    path: Assets/Scenes/IndieScene.unity
+    path: Assets/Scenes/DadelScene.unity
     guid: 2dfdde58159fdb04491dc75fd99245dc
+  - enabled: 1
+    path: Assets/Scenes/ActionScene.unity
+    guid: bd10eece73d8ae7439fc1d31e7152cfe
+  - enabled: 1
+    path: Assets/Scenes/BridgeScene.unity
+    guid: 34ac1eee8ad515a468a66663aed58495
   m_configObjects: {}

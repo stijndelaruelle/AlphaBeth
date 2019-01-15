@@ -275,7 +275,7 @@ public class LevelGenerator : MonoBehaviour
         }
 
         //Assign start node
-        m_StartNode = m_Nodes[m_Nodes.Count - 7];
+        //m_StartNode = null; // m_Nodes[m_Nodes.Count - 7];
 
         //Assign end node
         //m_EndNode

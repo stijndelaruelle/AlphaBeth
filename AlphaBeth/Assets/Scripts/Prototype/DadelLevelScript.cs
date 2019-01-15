@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class IndieLevelScript : MonoBehaviour
+public class DadelLevelScript : MonoBehaviour
 {
     [SerializeField]
     private LevelGenerator m_LevelGenerator;
