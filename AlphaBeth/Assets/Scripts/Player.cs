@@ -13,6 +13,16 @@ public class Player : Character
     //Variables
     private Direction m_LastDirection;
 
+    //Alternate step movement
+    private uint m_LastStepID = 0; //0 = Left, 1 = Right
+    private char[,] m_WalkCharacters = new char[,]
+                                        {
+                                            {'f', 'j'}, //North
+                                            {'k', 'l'}, //East
+                                            {'v', 'n'}, //South
+                                            {'s', 'd'}, //West
+                                        };
+
     //Events
     public event PlayerInputMistakeDelegate InputMistakeEvent;
     public event PlayerReachedExitDelegate ReachedExitEvent;
@@ -82,6 +92,8 @@ public class Player : Character
                         //Yep this is the node we want to move to!
                         if (neighbour.CanAccess(pressendChar))
                         {
+                            m_LastStepID = (m_LastStepID + 1) % 2; //Alternate between 0 and 1 (left & right)
+
                             SetNode(neighbour);
                             m_LastDirection = currentDirection;
                             return;
@@ -98,24 +110,70 @@ public class Player : Character
 
     public override void SetNode(Node node)
     {
+        //Cleanup
         if (m_CurrentNode != null)
             m_CurrentNode.RemovePlayer(this);
 
+        //TEST movement
+        ResetNodeFromWalkMovement(m_CurrentNode);
+
         //Change the current node
         base.SetNode(node);
-
-        m_CurrentNode = node;
 
         if (m_CurrentNode == null)
             return;
 
         m_CurrentNode.AddPlayer(this);
 
+        //TEST movement (alter the neighbours 
+        PrepareNodeForWalkMovement(m_CurrentNode);
+
         //Temp, should become a separate exit tile (just like HackShield)
         if (m_CurrentNode.IsExit)
         {
             if (ReachedExitEvent != null)
                 ReachedExitEvent();
+        }
+    }
+
+    private void ResetNodeFromWalkMovement(Node node)
+    {
+        if (node == null || node.GetOriginalTextCharacter() != ' ')
+            return;
+
+        node.SetTextCharacter(' ');
+
+        //Reset all the neighbours, if needed
+        for (int i = 0; i < 4; ++i)
+        {
+            Direction currentDirection = (Direction)i;
+
+            Node neighbour = m_CurrentNode.GetNeighbour(currentDirection);
+            if (neighbour != null)
+            {
+                if (neighbour.GetOriginalTextCharacter() == ' ')
+                    neighbour.SetTextCharacter(' ');
+            }
+        }
+    }
+
+    private void PrepareNodeForWalkMovement(Node node)
+    {
+        if (node == null || node.GetOriginalTextCharacter() != ' ')
+            return;
+
+        for (int i = 0; i < 4; ++i)
+        {
+            Direction currentDirection = (Direction)i;
+
+            Node neighbour = m_CurrentNode.GetNeighbour(currentDirection);
+            if (neighbour != null)
+            {
+                if (neighbour.GetOriginalTextCharacter() == ' ')
+                {
+                    neighbour.SetTextCharacter(m_WalkCharacters[i, m_LastStepID]);
+                }
+            }
         }
     }
 }

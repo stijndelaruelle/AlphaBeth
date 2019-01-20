@@ -38,12 +38,16 @@ public class LevelGenerator : MonoBehaviour
     private Coroutine m_CurrentRoutine;
     public event LevelDelegate LevelGeneratedEvent;
     
-    public void GenerateLevelFromChildren()
+    public bool GenerateLevelFromChildren()
     {
+        if (transform.childCount == 0)
+            return false;
+
         if (m_CurrentRoutine != null)
             StopCoroutine(m_CurrentRoutine);
 
         m_CurrentRoutine = StartCoroutine(GenerateLevelFromChildrenRoutine());
+        return true;
     }
 
     private IEnumerator GenerateLevelFromChildrenRoutine()
@@ -220,7 +224,6 @@ public class LevelGenerator : MonoBehaviour
         int width = levelData.IndexOf('\r');
         
         levelData = levelData.Replace("\r\n", ""); //Remove the enters
-        levelData = levelData.Replace(" ", ""); //Remove all the extra spaces
 
         int height = levelData.Length / width;
 
@@ -244,7 +247,7 @@ public class LevelGenerator : MonoBehaviour
             newNode.SetTextCharacter(levelData[i]);
 
             if (levelData[i] != '.')
-                newNode.name = newNode.name + " - " + newNode.GetTextCharacter();
+                newNode.name = newNode.name + " - '" + newNode.GetTextCharacter() + "'";
 
             m_Nodes.Add(newNode);
         }
@@ -275,7 +278,7 @@ public class LevelGenerator : MonoBehaviour
         }
 
         //Remove all the empty nodes (super inefficient, but I'm prototyping here!)
-        for (int i = m_Nodes.Count - 1; i > 0; --i)
+        for (int i = m_Nodes.Count - 1; i >= 0; --i)
         {
             Node currentNode = m_Nodes[i];
 

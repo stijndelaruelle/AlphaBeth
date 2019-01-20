@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -24,6 +23,7 @@ public class Node : MonoBehaviour
 
     [SerializeField] //Mostly so it get's remembered after making a prefab
     private char m_TextCharacter = '\0';
+    private char m_OriginalCharacter = '\0';
 
     [SerializeField] //Mostly so it get's remembered after making a prefab
     private Node[] m_Neighbours = new Node[4]; //Currently 4, could become 8
@@ -43,6 +43,8 @@ public class Node : MonoBehaviour
 
     //Only used for the fog of war
     private bool m_IsExplored = false;
+
+    //Only used for dissapearing tiles
     private bool m_IsAccessible = true;
     public bool IsAccessible
     {
@@ -50,7 +52,7 @@ public class Node : MonoBehaviour
         set { m_IsAccessible = value; } //Shouldn't be able to do that, super cheat for indie level
     }
 
-    //Only for the super indie level
+    //Only for the 'kruimelpad' level
     private bool m_IsVisible = true;
     public bool IsVisible
     {
@@ -67,17 +69,23 @@ public class Node : MonoBehaviour
     private void Awake()
     {
         m_Characters = new List<Character>();
+
+        if (m_OriginalCharacter == '\0')
+            m_OriginalCharacter = m_TextCharacter;
     }
 
     private void Start()
     {
-        SaveGameManager.BoolVariableChangedEvent += OnSaveGameBoolVariableChanged;  
+        SaveGameManager.BoolVariableChangedEvent += OnSaveGameBoolVariableChanged;
+
+        UpdateSprite();
     }
 
     private void OnDestroy()
     {
         SaveGameManager.BoolVariableChangedEvent -= OnSaveGameBoolVariableChanged;
     }
+
 
     public bool CanAccess()
     {
@@ -95,13 +103,14 @@ public class Node : MonoBehaviour
         return (typedChar == m_TextCharacter);
     }
 
+
     private void UpdateVisualText()
     {
         //Function that manages all the visual stuff, so we don't spread this all over the place
         if (m_Text == null)
             return;
 
-        m_Text.enabled = (m_Characters.Count == 0) && m_IsAccessible && m_IsVisible;
+        m_Text.enabled = (m_Characters.Count == 0) && m_IsAccessible && m_IsVisible && (m_TextCharacter != ' '); //TEMP for alternative movement prototyping
 
         //Check if fog of war is enabled
         if (SaveGameManager.GetBool(SaveGameManager.SAVE_OPTION_FOGOFWAR, true))
@@ -132,20 +141,29 @@ public class Node : MonoBehaviour
 
     private void UpdateSprite()
     {
-        m_Sprite.enabled = (m_Characters.Count == 0);
-        m_Sprite.sortingOrder = -100 - ((int)(transform.position.y) * 2) + (int)(transform.position.x);
+        if (m_Sprite != null)
+            m_Sprite.sortingOrder = -100 - ((int)(transform.position.y) * 2) + (int)(transform.position.x);
     }
+
 
     public void SetTextCharacter(char textChar)
     {
         m_TextCharacter = textChar;
+
+        if (m_OriginalCharacter == '\0')
+            m_OriginalCharacter = m_TextCharacter;
+
         UpdateVisualText();
-        UpdateSprite();
     }
 
     public char GetTextCharacter()
     {
         return m_TextCharacter;
+    }
+
+    public char GetOriginalTextCharacter()
+    {
+        return m_OriginalCharacter;
     }
 
     public void SetNeighbour(Direction direction, Node neighbour)
@@ -236,10 +254,13 @@ public class Node : MonoBehaviour
 
     public void ResetNode()
     {
-        //Level reset, so let's hide ourself
+        //Level reset, so let's hide ourselves
         m_IsExplored = false;
         m_IsAccessible = true;
         m_IsVisible = true;
+
+        if (m_OriginalCharacter != '\0')
+            m_TextCharacter = m_OriginalCharacter;
 
         m_Characters.Clear();
 

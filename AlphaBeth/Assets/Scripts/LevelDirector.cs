@@ -36,13 +36,11 @@ public class LevelDirector : Singleton<LevelDirector>
             m_LevelGenerator.LevelGeneratedEvent += OnLevelGenerated;
 
             //Generate a default level (so we don't start he game with the level settings menu open
-            if (m_LevelFileName != "")
+            bool success = m_LevelGenerator.GenerateLevelFromChildren();
+
+            if (success == false && m_LevelFileName != "")
             {
                 m_LevelGenerator.GenerateLevelFromFile(m_LevelFileName);
-            }
-            else
-            {
-                m_LevelGenerator.GenerateLevelFromChildren();
             }
         }
 
