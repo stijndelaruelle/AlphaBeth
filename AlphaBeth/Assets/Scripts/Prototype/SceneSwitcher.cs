@@ -7,7 +7,7 @@ public class SceneSwitcher : MonoBehaviour
 {
     private void Update()
     {
-        for (int i = 0; i < 5; ++i)
+        for (int i = 0; i < 6; ++i)
         {
             if (Input.GetKeyDown((KeyCode)(KeyCode.F1 + i)))
             {

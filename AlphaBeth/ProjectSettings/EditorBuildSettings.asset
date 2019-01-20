@@ -20,4 +20,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/CombatScene.unity
     guid: 18c2aeac19fb7374f89e7169b0888851
+  - enabled: 1
+    path: Assets/Scenes/AlternateMovmentScene.unity
+    guid: e404abba79615bc49a092714673a13fb
   m_configObjects: {}

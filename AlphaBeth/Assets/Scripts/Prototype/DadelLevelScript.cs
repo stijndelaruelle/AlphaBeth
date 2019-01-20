@@ -92,7 +92,7 @@ public class DadelLevelScript : MonoBehaviour
             node.IsAccessible = true;
             node.IsVisible = false;
 
-            if (node.GetTextCharacter() != '.' && prefab != null && node != currentNode)
+            if (prefab != null && node != currentNode)
             {
                 NodeSprite nodeSprite = GameObject.Instantiate<NodeSprite>(prefab);
                 nodeSprite.Initialize(node);

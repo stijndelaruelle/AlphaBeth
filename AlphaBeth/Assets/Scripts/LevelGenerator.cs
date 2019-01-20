@@ -274,6 +274,31 @@ public class LevelGenerator : MonoBehaviour
             }
         }
 
+        //Remove all the empty nodes (super inefficient, but I'm prototyping here!)
+        for (int i = m_Nodes.Count - 1; i > 0; --i)
+        {
+            Node currentNode = m_Nodes[i];
+
+            if (currentNode.GetTextCharacter() == '.')
+            {
+                //Remove all the neighbours
+                Node neighbour = currentNode.GetNeighbour(Direction.North);
+                if (neighbour != null) { neighbour.SetNeighbour(Direction.South, null); }
+
+                neighbour = currentNode.GetNeighbour(Direction.South);
+                if (neighbour != null) { neighbour.SetNeighbour(Direction.North, null); }
+
+                neighbour = currentNode.GetNeighbour(Direction.East);
+                if (neighbour != null) { neighbour.SetNeighbour(Direction.West, null); }
+
+                neighbour = currentNode.GetNeighbour(Direction.West);
+                if (neighbour != null) { neighbour.SetNeighbour(Direction.East, null); }
+
+                GameObject.Destroy(currentNode.gameObject);
+                m_Nodes.RemoveAt(i);
+            }
+        }
+
         //Assign start node
         //m_StartNode = null; // m_Nodes[m_Nodes.Count - 7];
 
@@ -284,7 +309,7 @@ public class LevelGenerator : MonoBehaviour
 
         //Let the world know!
         if (LevelGeneratedEvent != null)
-            LevelGeneratedEvent();
+        LevelGeneratedEvent();
 
         m_CurrentRoutine = null;
 
@@ -317,14 +342,6 @@ public class LevelGenerator : MonoBehaviour
     {
         string availableTextCharacters = SaveGameManager.GetString(SaveGameManager.SAVE_LEVEL_TEXTCHARACTERS, "sdfghjkl");
 
-        //Only assign characters to tiles that are not empty
-        List<Node> nodesToAssign = new List<Node>(m_Nodes);
-        for (int i = nodesToAssign.Count - 1; i >= 0; --i)
-        {
-            if (nodesToAssign[i].IsEmpty())
-                nodesToAssign.RemoveAt(i);
-        }
-
         //ClearNodeTextCharacters();
 
         if (seed == -1)
@@ -333,7 +350,7 @@ public class LevelGenerator : MonoBehaviour
             UnityEngine.Random.InitState(seed);
 
         //Give all the nodes a random character
-        foreach (Node currentNode in nodesToAssign)
+        foreach (Node currentNode in m_Nodes)
         {
             //Create an array of all still available characters
             List<char> availableTextCharactersList = new List<char>(availableTextCharacters.ToCharArray());

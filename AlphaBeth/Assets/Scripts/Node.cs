@@ -79,12 +79,17 @@ public class Node : MonoBehaviour
         SaveGameManager.BoolVariableChangedEvent -= OnSaveGameBoolVariableChanged;
     }
 
-    public bool CanAccess(char typedChar)
+    public bool CanAccess()
     {
         if (m_IsAccessible == false)
             return false;
 
-        if (IsEmpty())
+        return true;
+    }
+
+    public bool CanAccess(char typedChar)
+    {
+        if (CanAccess() == false)
             return false;
 
         return (typedChar == m_TextCharacter);
@@ -96,7 +101,7 @@ public class Node : MonoBehaviour
         if (m_Text == null)
             return;
 
-        m_Text.enabled = (m_Characters.Count == 0) && (m_TextCharacter != '.') && m_IsAccessible && m_IsVisible;
+        m_Text.enabled = (m_Characters.Count == 0) && m_IsAccessible && m_IsVisible;
 
         //Check if fog of war is enabled
         if (SaveGameManager.GetBool(SaveGameManager.SAVE_OPTION_FOGOFWAR, true))
@@ -127,7 +132,7 @@ public class Node : MonoBehaviour
 
     private void UpdateSprite()
     {
-        m_Sprite.enabled = (m_Characters.Count == 0) && (m_TextCharacter != '.'); //TEMP
+        m_Sprite.enabled = (m_Characters.Count == 0);
         m_Sprite.sortingOrder = -100 - ((int)(transform.position.y) * 2) + (int)(transform.position.x);
     }
 
@@ -141,11 +146,6 @@ public class Node : MonoBehaviour
     public char GetTextCharacter()
     {
         return m_TextCharacter;
-    }
-
-    public bool IsEmpty()
-    {
-        return (m_TextCharacter == '.');
     }
 
     public void SetNeighbour(Direction direction, Node neighbour)
