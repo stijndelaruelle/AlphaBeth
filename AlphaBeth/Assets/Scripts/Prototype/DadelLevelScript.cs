@@ -6,7 +6,18 @@ public class DadelLevelScript : MonoBehaviour
 {
     [SerializeField]
     private LevelGenerator m_LevelGenerator;
-    private List<Node> m_Nodes;
+
+    [SerializeField]
+    private Node m_DadelFinish;
+
+    [SerializeField]
+    private Node m_LawaaiFinish;
+
+    [SerializeField]
+    private Node m_ZwaanFinish;
+
+    [SerializeField]
+    private Node m_FinalFinish;
 
     [SerializeField]
     private NodeSprite m_DadelPrefab;
@@ -38,22 +49,15 @@ public class DadelLevelScript : MonoBehaviour
 
     private void OnLevelReady()
     {
-        //Super hacky, only works for this specific level!
-        if (m_LevelGenerator == null)
-            return;
-
-        m_Nodes = m_LevelGenerator.Nodes;
-
-        m_Nodes[6].PlayerEnterEvent += OnPlayerFinishedDadels;
-        m_Nodes[78].PlayerEnterEvent += OnPlayerFinishedLaweit;
-        m_Nodes[90].PlayerEnterEvent += OnPlayerFinishedZwanen;
+        m_DadelFinish.PlayerEnterEvent += OnPlayerFinishedDadels;
+        m_LawaaiFinish.PlayerEnterEvent += OnPlayerFinishedLaweit;
+        m_ZwaanFinish.PlayerEnterEvent += OnPlayerFinishedZwanen;
     }
 
     private void OnLevelStart()
     {
         //Remove the exit
-        if (m_Nodes != null)
-            m_Nodes[266].SetExit(false);
+        m_FinalFinish.SetExit(false);
 
         m_TriggeredEnding = false;
 
@@ -72,9 +76,6 @@ public class DadelLevelScript : MonoBehaviour
         if (m_TriggeredEnding)
             return;
 
-        if (m_Nodes == null)
-            return;
-
         //Add the pictures
         if (m_SpriteGameObjects == null)
             m_SpriteGameObjects = new List<NodeSprite>();
@@ -87,12 +88,12 @@ public class DadelLevelScript : MonoBehaviour
         m_SpriteGameObjects.Clear();
 
         //Make everything invisible
-        foreach (Node node in m_Nodes)
+        foreach (Node node in m_LevelGenerator.Nodes)
         {
             node.IsAccessible = true;
             node.IsVisible = false;
 
-            if (prefab != null && node != currentNode)
+            if (prefab != null && node != currentNode && node.GetOriginalTextCharacter() != '+')
             {
                 NodeSprite nodeSprite = GameObject.Instantiate<NodeSprite>(prefab);
                 nodeSprite.Initialize(node);
@@ -101,7 +102,7 @@ public class DadelLevelScript : MonoBehaviour
         }
 
         //Add an exit
-        m_Nodes[266].SetExit(true);
+        m_FinalFinish.SetExit(true);
         m_TriggeredEnding = true;
     }
 
@@ -109,18 +110,18 @@ public class DadelLevelScript : MonoBehaviour
     private void OnPlayerFinishedDadels(Character player)
     {
         Debug.Log("Dadels!");
-        ConvertLevelForStage2(m_Nodes[6], m_DadelPrefab);
+        ConvertLevelForStage2(m_DadelFinish, m_DadelPrefab);
     }
 
     private void OnPlayerFinishedZwanen(Character player)
     {
         Debug.Log("Zwanen!");
-        ConvertLevelForStage2(m_Nodes[90], m_ZwaanPrefab);
+        ConvertLevelForStage2(m_ZwaanFinish, m_ZwaanPrefab);
     }
 
     private void OnPlayerFinishedLaweit(Character player)
     {
         Debug.Log("Laweit!");
-        ConvertLevelForStage2(m_Nodes[78], m_LaweitPrefab);
+        ConvertLevelForStage2(m_LawaaiFinish, m_LaweitPrefab);
     }
 }

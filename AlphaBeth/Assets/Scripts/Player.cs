@@ -14,14 +14,48 @@ public class Player : Character
     private Direction m_LastDirection;
 
     //Alternate step movement
-    private uint m_LastStepID = 0; //0 = Left, 1 = Right
-    private char[,] m_WalkCharacters = new char[,]
+    private int m_LastStepID = 0; //0 = Left, 1 = Right
+    private char[,,] m_WalkCharacters = new char[,,]
                                         {
-                                            {'f', 'j'}, //North
-                                            {'k', 'l'}, //East
-                                            {'v', 'n'}, //South
-                                            {'s', 'd'}, //West
+                                            //All on 1 row
+                                            {
+                                                {'f', 'j'}, //North
+                                                {'k', 'l'}, //East
+                                                {'g', 'h'}, //South
+                                                {'s', 'd'}, //West
+                                            },
+                                            
+                                            //All on 1 row (optie 2)
+                                            {
+                                                {'f', 'j'}, //North
+                                                {'k', 'l'}, //East
+                                                {'a', ';'}, //South
+                                                {'s', 'd'}, //West
+                                            },
+
+                                            //3 rows
+                                            {
+                                                {'t', 'u'}, //North
+                                                {'k', 'l'}, //East
+                                                {'v', 'n'}, //South
+                                                {'s', 'd'}, //West
+                                            }
                                         };
+
+    //Options
+    private bool m_RandomizeCharacter = false;
+    public bool RandomizeCharacter
+    {
+        get { return m_RandomizeCharacter; }
+        set { m_RandomizeCharacter = value; }
+    }
+
+    private int m_WalkCharacterSet = 0;
+    public int WalkCharacterSet
+    {
+        get { return m_WalkCharacterSet; }
+        set { m_WalkCharacterSet = value; }
+    }
 
     //Events
     public event PlayerInputMistakeDelegate InputMistakeEvent;
@@ -138,10 +172,11 @@ public class Player : Character
 
     private void ResetNodeFromWalkMovement(Node node)
     {
-        if (node == null || node.GetOriginalTextCharacter() != ' ')
+        if (node == null)
             return;
 
-        node.SetTextCharacter(' ');
+        if (node.GetOriginalTextCharacter() == '+')
+            node.SetTextCharacter('+');
 
         //Reset all the neighbours, if needed
         for (int i = 0; i < 4; ++i)
@@ -151,15 +186,15 @@ public class Player : Character
             Node neighbour = m_CurrentNode.GetNeighbour(currentDirection);
             if (neighbour != null)
             {
-                if (neighbour.GetOriginalTextCharacter() == ' ')
-                    neighbour.SetTextCharacter(' ');
+                if (neighbour.GetOriginalTextCharacter() == '+')
+                    neighbour.SetTextCharacter('+');
             }
         }
     }
 
     private void PrepareNodeForWalkMovement(Node node)
     {
-        if (node == null || node.GetOriginalTextCharacter() != ' ')
+        if (node == null)
             return;
 
         for (int i = 0; i < 4; ++i)
@@ -169,9 +204,15 @@ public class Player : Character
             Node neighbour = m_CurrentNode.GetNeighbour(currentDirection);
             if (neighbour != null)
             {
-                if (neighbour.GetOriginalTextCharacter() == ' ')
+                if (neighbour.GetOriginalTextCharacter() == '+')
                 {
-                    neighbour.SetTextCharacter(m_WalkCharacters[i, m_LastStepID]);
+                    int characterID = m_LastStepID;
+
+                    //Options
+                    if (m_RandomizeCharacter)
+                        characterID = Random.Range(0, m_WalkCharacters.GetLength(2));
+
+                    neighbour.SetTextCharacter(m_WalkCharacters[m_WalkCharacterSet, i, characterID]);
                 }
             }
         }

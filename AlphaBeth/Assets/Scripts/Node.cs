@@ -110,7 +110,7 @@ public class Node : MonoBehaviour
         if (m_Text == null)
             return;
 
-        m_Text.enabled = (m_Characters.Count == 0) && m_IsAccessible && m_IsVisible && (m_TextCharacter != ' '); //TEMP for alternative movement prototyping
+        m_Text.enabled = (m_Characters.Count == 0) && m_IsAccessible && m_IsVisible && (m_TextCharacter != '+'); //TEMP for alternative movement prototyping
 
         //Check if fog of war is enabled
         if (SaveGameManager.GetBool(SaveGameManager.SAVE_OPTION_FOGOFWAR, true))
